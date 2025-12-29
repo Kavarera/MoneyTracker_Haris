@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "MoneyTracker.WinUI (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "MoneyTracker.WinUI (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
