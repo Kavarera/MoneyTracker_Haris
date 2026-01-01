@@ -19,7 +19,7 @@ namespace MoneyTracker.WinUI.View
             {
                 ResizeToContent();
             };
-            viewModel = vm ?? throw new ArgumentNullException(nameof(vm)); ;
+            viewModel = vm ?? throw new ArgumentNullException(nameof(vm)); 
         }
 
         private void ResizeToContent()
@@ -82,17 +82,28 @@ namespace MoneyTracker.WinUI.View
 
         }
 
-        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        private async void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             SaveButton.IsEnabled = false;
+            TestConnectionButton.IsEnabled = false;
 
             var ok = viewModel.SaveConnection();
 
             if (!ok)
             {
                 SaveButton.IsEnabled = true;
+                TestConnectionButton.IsEnabled = true;
                 return;
             }
+            var result = await viewModel.TestConnection();
+            if (!result)
+            {
+                StatusMessage.Foreground = new SolidColorBrush(Colors.Red);
+                SaveButton.IsEnabled = true;
+                TestConnectionButton.IsEnabled = true;
+                return;
+            }
+
 
             var dashboard = new DashboardWindow(
                 AppHostManager.AppHost.Services.GetRequiredService<DashboardWindowViewModel>()

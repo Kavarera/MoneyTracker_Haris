@@ -6,10 +6,46 @@
     xmlns:local="using:MoneyTracker.WinUI.View"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:customCtrl="using:MoneyTracker.WinUI.Components"
+    xmlns:utils="using:MoneyTracker.WinUI.Utils"
+
     mc:Ignorable="d"
-    Title="DashboardWindow">
+    Title="Dashboard">
 
     <Grid>
+        <SplitView x:Name="splitView" PaneBackground="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}"
+           IsPaneOpen="{x:Bind _viewModel.IsSplitPaneOpen, Mode=OneWay}" OpenPaneLength="256" CompactPaneLength="56" DisplayMode="CompactInline">
+            <SplitView.Pane >
+                <Grid>
+                    <Grid.Resources>
+                        <utils:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+                    </Grid.Resources>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Button Name="SplitPaneToggleButton" Grid.Row="0" Margin="5,20,0,0" Click="{x:Bind _viewModel.ToggleSplitPane}"
+                            >
+                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE71D;"/>
+                    </Button>
+                    <customCtrl:HandButton Grid.Row="1" Content="Change Connection" x:Name="ChangeConnectionButton" Margin="20, 20"
+                            HorizontalAlignment="Stretch"
+                            BorderBrush="Red" BorderThickness="2" CornerRadius="8"
+                            Visibility="{Binding IsSplitPaneOpen, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <!--Atur style button-->
+                        <Button.Resources>
+                            <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="DarkRed" />
+                            <SolidColorBrush x:Key="ButtonForegroundPointerOver" Color="White" />
 
+                            <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="Transparent" />
+                            <SolidColorBrush x:Key="ButtonForegroundPressed" Color="Black" />
+                        </Button.Resources>
+                    </customCtrl:HandButton>
+                </Grid>
+            </SplitView.Pane>
+
+        </SplitView>
     </Grid>
 </Window>

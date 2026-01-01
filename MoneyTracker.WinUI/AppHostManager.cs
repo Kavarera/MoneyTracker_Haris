@@ -36,6 +36,8 @@ namespace MoneyTracker.WinUI
                 //ViewModels
                 // Connection Window
                 services.AddTransient<ConnectionViewModel>();
+                //Dashboard Window
+                services.AddTransient<DashboardWindowViewModel>();
 
 
                 //Infrastructure Layer
