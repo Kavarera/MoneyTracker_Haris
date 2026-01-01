@@ -12,18 +12,15 @@ namespace MoneyTracker.WinUI
     
     public partial class App : Microsoft.UI.Xaml.Application
     {
-        public static IHost? Host;
         public App()
         {
             this.InitializeComponent();
-            _ = AppHostManager.StartAsync();
-
-            
         }
 
-        protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
+        protected override async void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
         {
-            m_window = new ConnectionWindow(Host.Services.GetRequiredService<ConnectionViewModel>());
+            await AppHostManager.StartAsync();
+            m_window = new ConnectionWindow(AppHostManager.AppHost.Services.GetRequiredService<ConnectionViewModel>());
             m_window.Activate();
         }
 

@@ -1,6 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.Extensions.Logging;
 using MoneyTracker.Application.Command;
 using MoneyTracker.Application.Interface;
+using System;
 using System.Threading.Tasks;
 
 namespace MoneyTracker.WinUI.ViewModel
@@ -9,6 +11,9 @@ namespace MoneyTracker.WinUI.ViewModel
     {
         private readonly IConnectionDatabaseProvider _connectionDatabaseProvider;
         private readonly IAppControlService _appControlService;
+        private readonly IConnectionDbTest _connectionDbTest;
+        private readonly ILogger<ConnectionViewModel> _logger;
+
         [ObservableProperty] private string _host = "localhost";
         [ObservableProperty] private double _port = 5432; // NumberBox menggunakan double
         [ObservableProperty] private string _database = "moneytracker";
@@ -16,10 +21,29 @@ namespace MoneyTracker.WinUI.ViewModel
         [ObservableProperty] private string _password = "123456";
         [ObservableProperty] private string _statusMessage;
 
+        public ConnectionViewModel(IConnectionDatabaseProvider connectionDatabaseProvider, 
+            IAppControlService appControlService, 
+            IConnectionDbTest connectionDbTest,
+            ILogger<ConnectionViewModel> log)
+        {
+            _connectionDatabaseProvider = connectionDatabaseProvider;
+            _appControlService = appControlService;
+            _connectionDbTest = connectionDbTest;
+            _logger = log;
+        }
+
         public async Task SaveConnection()
         {
             _connectionDatabaseProvider.Set(_host, _port.ToString(), _database, _username, _password);
             await _appControlService.RestartAsync();
+        }
+
+        public async Task<bool> TestConnection()
+        {
+            _logger.LogInformation("Test Connection Started");
+            var res = await _connectionDbTest.TestConnectionAsync(_host, Int32.Parse(_port.ToString()), _database, _username, _password);
+            StatusMessage = res.Message;
+            return res.Success;
         }
     }
 }

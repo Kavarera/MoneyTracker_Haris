@@ -15,7 +15,7 @@ namespace MoneyTracker.WinUI
 {
     internal class AppHostManager
     {
-        public static IHost AppHost { get; private set; }
+        public static IHost AppHost { get; private set; } = default!;
         public static async Task StartAsync()
         {
             AppHost = Microsoft.Extensions.Hosting.Host

@@ -8,6 +8,12 @@ namespace MoneyTracker.Application.Interface
 {
     public interface IConnectionDbTest
     {
-        Task<bool> TestConnectionAsync(string host, int port, string database, string username, string password, CancellationToken token = default);
+        Task<(bool Success, string Message)> TestConnectionAsync(
+        string host,
+        int port,
+        string database,
+        string username,
+        string password,
+        CancellationToken token = default);
     }
 }

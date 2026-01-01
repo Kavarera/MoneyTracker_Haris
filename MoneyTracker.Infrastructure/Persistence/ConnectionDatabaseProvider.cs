@@ -20,5 +20,7 @@ namespace MoneyTracker.Infrastructure.Persistence
         {
             _connectionString = $"Host={host};Port={port};Database={database};Username={username};Password={password};";
         }
+
+        
     }
 }

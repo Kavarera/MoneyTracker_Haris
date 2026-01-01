@@ -65,12 +65,25 @@ namespace MoneyTracker.WinUI.View
 
         private async void TestConnectionButton_Click(object sender, RoutedEventArgs e)
         {
-            
+            TestConnectionButton.IsEnabled = false;
+            SaveButton.IsEnabled = false;
+            var result = await viewModel.TestConnection();
+            if (result)
+            {
+                StatusMessage.Foreground = new SolidColorBrush(Colors.Green);
+            }
+            else
+            {
+                StatusMessage.Foreground = new SolidColorBrush(Colors.Red);
+            }
+            TestConnectionButton.IsEnabled = true;
+            SaveButton.IsEnabled = true;
+
         }
 
-        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        private async void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            
+           
         }
     }
 }
