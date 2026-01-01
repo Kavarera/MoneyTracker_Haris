@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -81,9 +82,26 @@ namespace MoneyTracker.WinUI.View
 
         }
 
-        private async void SaveButton_Click(object sender, RoutedEventArgs e)
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-           
+            SaveButton.IsEnabled = false;
+
+            var ok = viewModel.SaveConnection();
+
+            if (!ok)
+            {
+                SaveButton.IsEnabled = true;
+                return;
+            }
+
+            var dashboard = new DashboardWindow(
+                AppHostManager.AppHost.Services.GetRequiredService<DashboardWindowViewModel>()
+            );
+
+            dashboard.Activate();
+
+            // tutup window ini
+            this.Close();
         }
     }
 }

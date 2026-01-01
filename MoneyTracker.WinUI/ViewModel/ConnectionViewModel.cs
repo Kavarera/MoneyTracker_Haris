@@ -32,10 +32,10 @@ namespace MoneyTracker.WinUI.ViewModel
             _logger = log;
         }
 
-        public async Task SaveConnection()
+        public bool SaveConnection()
         {
             _connectionDatabaseProvider.Set(_host, _port.ToString(), _database, _username, _password);
-            await _appControlService.RestartAsync();
+            return true;
         }
 
         public async Task<bool> TestConnection()
