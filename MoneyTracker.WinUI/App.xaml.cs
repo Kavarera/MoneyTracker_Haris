@@ -16,30 +16,9 @@ namespace MoneyTracker.WinUI
         public App()
         {
             this.InitializeComponent();
+            _ = AppHostManager.StartAsync();
 
-            Host = Microsoft.Extensions.Hosting.Host
-            .CreateDefaultBuilder()
-            .ConfigureServices((context, services) =>
-            {
-                services.AddLogging(builder =>
-                {
-                    builder.ClearProviders();
-                    builder.AddConsole();
-                    builder.AddDebug();
-
-                });
-                // register services / repos / usecases di sini
-                
-                //Application layer
-                //ViewModels
-                // Connection Window
-                services.AddTransient<ConnectionViewModel>();
-
-
-                //Infrastructure Layer
-                services.AddInfrastructure();
-            })
-            .Build();
+            
         }
 
         protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)

@@ -10,9 +10,13 @@ namespace MoneyTracker.Infrastructure
     {
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, string connectionString="")
         {
-            services.AddDbContext<AppDbContext>(options =>
+
+            services.AddSingleton<IConnectionDatabaseProvider>(_=>new ConnectionDatabaseProvider("",5432,"","",""));
+
+            services.AddDbContext<AppDbContext>((sp, options) =>
             {
-                options.UseNpgsql(connectionString);
+                var store = sp.GetRequiredService<IConnectionDatabaseProvider>();
+                options.UseNpgsql(store.GetConnectionString());
                 options.EnableSensitiveDataLogging();
             });
 

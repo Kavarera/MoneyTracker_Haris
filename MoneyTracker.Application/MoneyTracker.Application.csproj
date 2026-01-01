@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Command\" />
     <Folder Include="DTO\" />
     <Folder Include="Usecase\" />
   </ItemGroup>
