@@ -2,14 +2,15 @@ using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
+using MoneyTracker.WinUI.ViewModel;
 using System;
 
 namespace MoneyTracker.WinUI.View
 {
     public sealed partial class ConnectionWindow : Window
     {
-        public ConnectionViewModel viewModel { get; } = App.Services.GetRequiredService<ConnectionViewModel>();
-        public ConnectionWindow()
+        public ConnectionViewModel viewModel { get; }
+        public ConnectionWindow(ConnectionViewModel vm)
         {
             this.InitializeComponent();
             // Kita tunggu sampai StackPanel 'InnerContent' selesai di-render
@@ -17,6 +18,7 @@ namespace MoneyTracker.WinUI.View
             {
                 ResizeToContent();
             };
+            viewModel = vm ?? throw new ArgumentNullException(nameof(vm)); ;
         }
 
         private void ResizeToContent()
@@ -63,37 +65,12 @@ namespace MoneyTracker.WinUI.View
 
         private async void TestConnectionButton_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is Button btn)
-            {
-                try
-                {
-                    btn.IsEnabled = false;
-                    await viewModel.TestConnectionAsync();
-
-                    // With the following corrected line:
-                    StatusMessage.Foreground = new SolidColorBrush(Colors.Green);
-                }
-                catch (Exception ex)
-                {
-                    viewModel.StatusMessage = ex.Message;
-                    StatusMessage.Foreground = new SolidColorBrush(Colors.Red);
-                }
-                finally
-                {
-                    btn.IsEnabled = true;
-                }
-            }
+            
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is Button btn)
-            {
-                viewModel.Save();
-                //var dW = new DashboardWindow();
-                //dW.Activate();
-                this.Close();
-            }
+            
         }
     }
 }

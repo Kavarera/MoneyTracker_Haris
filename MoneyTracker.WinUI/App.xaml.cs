@@ -2,17 +2,15 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
+using MoneyTracker.Infrastructure;
+using MoneyTracker.WinUI.View;
 using MoneyTracker.WinUI.ViewModel;
-using System;
-using System.Net;
-using Windows.Networking.Connectivity;
 
 
 namespace MoneyTracker.WinUI
 {
     
-    public partial class App : Application
+    public partial class App : Microsoft.UI.Xaml.Application
     {
         public static IHost? Host;
         public App()
@@ -31,34 +29,22 @@ namespace MoneyTracker.WinUI
 
                 });
                 // register services / repos / usecases di sini
+                
+                //Application layer
+                //ViewModels
+                // Connection Window
+                services.AddTransient<ConnectionViewModel>();
 
-                RegisteredServices(services);
+
+                //Infrastructure Layer
+                services.AddInfrastructure();
             })
             .Build();
         }
 
-
-        private void RegisteredServices(IServiceCollection services)
-        {
-            //DB Session
-
-            //App Interfaces
-
-            //EF Core Factory
-
-            //ViewModels
-            services.AddTransient<ConnectionViewModel>();
-
-            services.AddLogging(builder =>
-            {
-                builder.AddDebug();
-            });
-
-        }
-
         protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
         {
-            m_window = new MainWindow();
+            m_window = new ConnectionWindow(Host.Services.GetRequiredService<ConnectionViewModel>());
             m_window.Activate();
         }
 

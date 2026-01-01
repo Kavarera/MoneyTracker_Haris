@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <Folder Include="Command\" />
-    <Folder Include="Interface\" />
     <Folder Include="DTO\" />
     <Folder Include="Usecase\" />
   </ItemGroup>

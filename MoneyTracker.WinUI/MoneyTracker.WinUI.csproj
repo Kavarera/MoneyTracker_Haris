@@ -45,6 +45,10 @@
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.251106002" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\MoneyTracker.Application\MoneyTracker.Application.csproj" />
+    <ProjectReference Include="..\MoneyTracker.Infrastructure\MoneyTracker.Infrastructure.csproj" />
+  </ItemGroup>
+  <ItemGroup>
     <Page Update="View\ConnectionWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
