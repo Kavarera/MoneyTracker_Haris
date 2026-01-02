@@ -24,12 +24,11 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
-                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                    <Button Name="SplitPaneToggleButton" Grid.Row="0" Margin="5,20,0,0" Click="{x:Bind _viewModel.ToggleSplitPane}"
+                    <customCtrl:HandButton Name="SplitPaneToggleButton" Grid.Row="0" Margin="5,20,0,0" Click="{x:Bind _viewModel.ToggleSplitPane}"
                             >
                         <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE71D;"/>
-                    </Button>
+                    </customCtrl:HandButton>
                     <customCtrl:HandButton Grid.Row="1" Content="Change Connection" x:Name="ChangeConnectionButton" Margin="20, 20"
                             HorizontalAlignment="Stretch"
                             BorderBrush="Red" BorderThickness="2" CornerRadius="8"
@@ -43,6 +42,20 @@
                             <SolidColorBrush x:Key="ButtonForegroundPressed" Color="Black" />
                         </Button.Resources>
                     </customCtrl:HandButton>
+
+                    <Grid Grid.Row="2">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        
+                        <!--Account List-->
+                        <TextBlock Grid.Row="0" Text="Accounts" Margin="10,20"/>
+                        
+
+                    </Grid>
                 </Grid>
             </SplitView.Pane>
 

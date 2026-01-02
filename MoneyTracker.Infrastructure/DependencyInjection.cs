@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using MoneyTracker.Application.Interface;
+using MoneyTracker.Domain.Interface;
+using MoneyTracker.Infrastructure.ImplementRepository;
 using MoneyTracker.Infrastructure.Persistence;
 using MoneyTracker.Infrastructure.Service;
 
@@ -20,7 +22,10 @@ namespace MoneyTracker.Infrastructure
                 options.EnableSensitiveDataLogging();
             });
 
-            services.AddTransient<IConnectionDbTest, ConnectionDbTest>();
+            services.AddSingleton<IConnectionDbTest, ConnectionDbTest>();
+
+            //implement repo
+            services.AddScoped<IAccountRepository, AccountRepository>();
             return services;
         }
     }
