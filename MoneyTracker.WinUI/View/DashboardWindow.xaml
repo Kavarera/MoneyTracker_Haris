@@ -19,7 +19,7 @@
            IsPaneOpen="{x:Bind _viewModel.IsSplitPaneOpen, Mode=OneWay}" OpenPaneLength="256" CompactPaneLength="56" DisplayMode="CompactInline">
             <SplitView.Pane >
                 <Grid>
-                    
+
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
@@ -87,7 +87,7 @@
 
 
                     </Grid>
-                    
+
                     <!--Untuk setting accounts list mana yg mau muncul dan kategori list mana yg mau muncul-->
                     <StackPanel Grid.Row="3">
 
@@ -104,7 +104,7 @@
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
                                     </Grid.RowDefinitions>
-                                    
+
                                     <!--Button Untuk reset-->
                                     <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="20">
                                         <customCtrl:HandButton x:Name="resetAllDisplayDataButton" Grid.Row="0" Content="Reset" Click="resetAllDisplayDataButton_Click" />
@@ -144,6 +144,58 @@
                     </StackPanel>
                 </Grid>
             </SplitView.Pane>
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0" Margin="10,20">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="4*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <customCtrl:HandDropDownButton Grid.Column="0" Content="Import CSV" BorderBrush="DarkOrange" BorderThickness="3" Padding="20,5"
+                                    FontWeight="Bold" Foreground="DarkOrange">
+                        <customCtrl:HandDropDownButton.Resources>
+                            <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="Orange" />
+                            <SolidColorBrush x:Key="ButtonBorderBrushPointerOver" Color="White" />
+                            <SolidColorBrush x:Key="ButtonForegroundPointerOver" Color="Black" />
+
+                            <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="White" />
+                        </customCtrl:HandDropDownButton.Resources>
+                        <DropDownButton.Flyout>
+                            <MenuFlyout Placement="Bottom">
+                                <MenuFlyoutItem Text="Categories"/>
+                                <MenuFlyoutItem Text="Accounts"/>
+                                <MenuFlyoutItem Text="Transactions"/>
+                            </MenuFlyout>
+                        </DropDownButton.Flyout>
+                    </customCtrl:HandDropDownButton>
+                    <StackPanel Grid.Column="1" Margin="20,0" Orientation="Horizontal" Spacing="20" HorizontalAlignment="Center">
+                        <customCtrl:HandButton Margin="5,20,0,0" Background="Transparent" BorderBrush="Transparent" >
+
+                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE71C;" Foreground="Cyan">
+                                <FontIcon.Resources>
+                                    <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="Cyan" />
+                                </FontIcon.Resources>
+                            </FontIcon>
+                        </customCtrl:HandButton>
+                        <customCtrl:HandButton Margin="5,20,0,0" Background="White" BorderBrush="LightSkyBlue" Foreground="Blue"
+                                               Content="Edit Mode" CornerRadius="6" BorderThickness="3" FontWeight="SemiBold"
+                                               Padding="20,5">
+                            <customCtrl:HandButton.Resources>
+                                <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="Blue" />
+                                <SolidColorBrush x:Key="ButtonBorderBrushPointerOver" Color="Cyan" />
+                                <SolidColorBrush x:Key="ButtonForegroundPointerOver" Color="White" />
+
+                                <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="Green" />
+                                <SolidColorBrush x:Key="ButtonForegroundPressed" Color="White"/>
+                            </customCtrl:HandButton.Resources>
+                        </customCtrl:HandButton>
+                    </StackPanel>
+                </Grid>
+            </Grid>
 
         </SplitView>
     </Grid>
