@@ -23,7 +23,8 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="2*"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
                     <customCtrl:HandButton Name="SplitPaneToggleButton" Grid.Row="0" Margin="5,20,0,0" Click="{x:Bind _viewModel.ToggleSplitPane}"
                             >
@@ -52,14 +53,14 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
-                        
+
                         <!--Account List-->
                         <TextBlock Grid.Row="0" Text="Accounts" Margin="10,5" FontWeight="SemiBold" FontSize="18"/>
                         <ProgressRing Grid.Row="1" IsActive="True" Width="32" Height="32" HorizontalAlignment="Center"
                                       Margin="0,16,0,0"
                                       Visibility="{Binding IsLoadingData, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
-                        <ListView Grid.Row="1" ItemsSource="{x:Bind _viewModel.Accounts}"
+                        <ListView Grid.Row="1" x:Name="AccountsList" ItemsSource="{x:Bind _viewModel.DisplayAccounts, Mode=OneWay}"
                                   Visibility="{Binding IsNotLoadingData, Converter={StaticResource BoolToVisibilityConverter}}">
                             <ListView.ItemTemplate>
                                 <DataTemplate x:DataType="dto:AccountDTO">
@@ -68,12 +69,12 @@
                             </ListView.ItemTemplate>
                         </ListView>
 
-                        <!--Account List-->
+                        <!--Categories List-->
                         <TextBlock Grid.Row="2" Text="Categories" Margin="10,5" FontWeight="SemiBold" FontSize="18"/>
                         <ProgressRing Grid.Row="3" IsActive="True" Width="32" Height="32" HorizontalAlignment="Center" Margin="0,16,0,0" 
                                       Visibility="{Binding IsLoadingData, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
-                        <ListView Grid.Row="3" x:Name="CategoriesList" ItemsSource="{x:Bind _viewModel.Categories}" IsItemClickEnabled="True"
+                        <ListView Grid.Row="3" x:Name="CategoriesList" ItemsSource="{x:Bind _viewModel.DisplayCategories, Mode=OneWay}" IsItemClickEnabled="True"
                                   Visibility="{Binding IsNotLoadingData, Converter={StaticResource BoolToVisibilityConverter}}"
                                   SelectionMode="Single"
                                   ItemClick="CategoriesList_ItemClick">
@@ -86,6 +87,61 @@
 
 
                     </Grid>
+                    
+                    <!--Untuk setting accounts list mana yg mau muncul dan kategori list mana yg mau muncul-->
+                    <StackPanel Grid.Row="3">
+
+                        <Expander x:Name="settingsExpander" ExpandDirection="Up" VerticalAlignment="Bottom">
+                            <Expander.Header>
+                                Select Accounts and Categories
+                            </Expander.Header>
+                            <Expander.Content>
+                                <Grid Loaded="CategoriesAccountsListSettings_Loaded">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    
+                                    <!--Button Untuk reset-->
+                                    <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="20">
+                                        <customCtrl:HandButton x:Name="resetAllDisplayDataButton" Grid.Row="0" Content="Reset" Click="resetAllDisplayDataButton_Click" />
+                                        <customCtrl:HandButton x:Name="selectAllDisplayDataButton" Content="Select All" Click="selectAllDisplayDataButton_Click"/>
+                                    </StackPanel>
+
+                                    <!--Account List-->
+                                    <TextBlock Grid.Row="1" Text="Accounts" Margin="10,5" FontWeight="SemiBold" FontSize="18"/>
+                                    <ListView Grid.Row="2" x:Name="AccountsListSettings" ItemsSource="{x:Bind _viewModel.Accounts, Mode=OneWay}" SelectionMode="Multiple"
+                                              IsItemClickEnabled="True"
+                                            Visibility="{Binding IsNotLoadingData, Converter={StaticResource BoolToVisibilityConverter}}"
+                                              SelectionChanged="AccountsListSettings_SelectionChanged"
+                                              ItemClick="AccountsListSettings_ItemClick">
+                                        <ListView.ItemTemplate>
+                                            <DataTemplate x:DataType="dto:AccountDTO">
+                                                <TextBlock Text="{Binding Name}"/>
+                                            </DataTemplate>
+                                        </ListView.ItemTemplate>
+                                    </ListView>
+
+
+                                    <!--Categories-->
+                                    <TextBlock Grid.Row="3" Text="Categories" Margin="10,5" FontWeight="SemiBold" FontSize="18"/>
+                                    <ListView Grid.Row="4" x:Name="CategoriesListSettings" ItemsSource="{x:Bind _viewModel.Categories, Mode=OneWay}" IsItemClickEnabled="True"
+                                            Visibility="{Binding IsNotLoadingData, Converter={StaticResource BoolToVisibilityConverter}}" SelectionMode="Multiple"
+                                            ItemClick="CategoriesListSettings_ItemClick"
+                                              SelectionChanged="CategoriesListSettings_SelectionChanged">
+                                        <ListView.ItemTemplate>
+                                            <DataTemplate x:DataType="dto:CategoryDTO">
+                                                <TextBlock Text="{Binding CategoryName}"/>
+                                            </DataTemplate>
+                                        </ListView.ItemTemplate>
+                                    </ListView>
+                                </Grid>
+                            </Expander.Content>
+                        </Expander>
+                    </StackPanel>
                 </Grid>
             </SplitView.Pane>
 
