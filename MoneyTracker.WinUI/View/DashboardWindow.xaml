@@ -48,9 +48,9 @@
 
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="*"/>
                             <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
                         
                         <!--Account List-->
@@ -64,6 +64,22 @@
                             <ListView.ItemTemplate>
                                 <DataTemplate x:DataType="dto:AccountDTO">
                                     <TextBlock Text="{Binding Name}"/>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+
+                        <!--Account List-->
+                        <TextBlock Grid.Row="2" Text="Categories" Margin="10,5" FontWeight="SemiBold" FontSize="18"/>
+                        <ProgressRing Grid.Row="3" IsActive="True" Width="32" Height="32" HorizontalAlignment="Center" Margin="0,16,0,0" 
+                                      Visibility="{Binding IsLoadingData, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+                        <ListView Grid.Row="3" x:Name="CategoriesList" ItemsSource="{x:Bind _viewModel.Categories}" IsItemClickEnabled="True"
+                                  Visibility="{Binding IsNotLoadingData, Converter={StaticResource BoolToVisibilityConverter}}"
+                                  SelectionMode="Single"
+                                  ItemClick="CategoriesList_ItemClick">
+                            <ListView.ItemTemplate>
+                                <DataTemplate x:DataType="dto:CategoryDTO">
+                                    <TextBlock Text="{Binding CategoryName}"/>
                                 </DataTemplate>
                             </ListView.ItemTemplate>
                         </ListView>

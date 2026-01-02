@@ -15,8 +15,10 @@ namespace MoneyTracker.WinUI.ViewModel
         private readonly ILogger<DashboardWindowViewModel> _log;
 
         private readonly GetAccounts _getAccounts;
+        private readonly GetCategories _getCategories;
 
         public ObservableCollection<AccountDTO> Accounts { get; } = new();
+        public ObservableCollection<CategoryDTO> Categories { get; } = new();
 
         [ObservableProperty] private bool _isSplitPaneOpen = true;
 
@@ -30,10 +32,11 @@ namespace MoneyTracker.WinUI.ViewModel
         }
 
 
-        public DashboardWindowViewModel(ILogger<DashboardWindowViewModel> logger, GetAccounts getAccounts)
+        public DashboardWindowViewModel(ILogger<DashboardWindowViewModel> logger, GetAccounts getAccounts, GetCategories getCategories)
         {
             _log = logger;
             _getAccounts = getAccounts;
+            _getCategories = getCategories;
         }
 
         [RelayCommand]
@@ -51,10 +54,17 @@ namespace MoneyTracker.WinUI.ViewModel
                 _log.LogInformation("Loading accounts");
 
                 var items = await _getAccounts.ExecuteAsync();
+                var items2 = await _getCategories.ExecuteAsync();
+                IsLoadingData = false;
                 Accounts.Clear();
+                Categories.Clear();
                 foreach (var item in items)
                 {
                     Accounts.Add(item);
+                }
+                foreach (var item in items2)
+                {
+                    Categories.Add(item);
                 }
             }
             catch (Exception ex)

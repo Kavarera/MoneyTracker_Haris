@@ -17,7 +17,7 @@ namespace MoneyTracker.Infrastructure.ImplementRepository
 
         public async Task<IReadOnlyList<AccountEntity>> GetAllAsync(CancellationToken cancellationToken)
         {
-            return await _dbContext.Accounts.AsNoTracking().ToListAsync(cancellationToken);
+            return await _dbContext.Accounts.AsNoTracking().ToListAsync(cancellationToken).;
         }
     }
 }

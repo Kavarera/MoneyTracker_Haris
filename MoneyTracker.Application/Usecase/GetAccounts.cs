@@ -15,11 +15,11 @@ namespace MoneyTracker.Application.Usecase
         public async Task<IReadOnlyList<AccountDTO>> ExecuteAsync(
         CancellationToken cancellationToken = default)
         {
-            var categories = await _accountRepository.GetAllAsync(cancellationToken);
+            var accounts = await _accountRepository.GetAllAsync(cancellationToken);
 
             // di sini tempat aturan aplikasi
             // contoh filtering / sorting dll
-            return categories
+            return accounts
                 .OrderBy(c => c.AccountName)
                 .Select(c => new AccountDTO(c.Id, c.AccountName))
                 .ToList();

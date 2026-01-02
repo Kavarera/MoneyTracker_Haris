@@ -26,6 +26,7 @@ namespace MoneyTracker.Infrastructure
 
             //implement repo
             services.AddScoped<IAccountRepository, AccountRepository>();
+            services.AddScoped<ICategoryRepository, CategoryRepository>();
             return services;
         }
     }

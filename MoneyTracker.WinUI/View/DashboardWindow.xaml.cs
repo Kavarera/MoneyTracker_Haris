@@ -5,6 +5,7 @@ using Microsoft.UI.Input;
 using MoneyTracker.WinUI.ViewModel;
 using System;
 using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Controls;
 
 namespace MoneyTracker.WinUI.View
 {
@@ -30,6 +31,22 @@ namespace MoneyTracker.WinUI.View
                 appWindow.SetPresenter(AppWindowPresenterKind.FullScreen);
             }
 
+        }
+
+        private void CategoriesList_ItemClick(object sender, Microsoft.UI.Xaml.Controls.ItemClickEventArgs e)
+        {
+            // Cek apakah item yang diklik sama dengan item yang sedang aktif/terpilih
+            if (CategoriesList.SelectedItem == e.ClickedItem)
+            {
+                // Jika sama, hapus seleksi (unfocus secara visual seleksi)
+                CategoriesList.SelectedItem = null;
+                FocusManager.TryMoveFocus(FocusNavigationDirection.Next);
+            }
+            else
+            {
+                // Jika beda, biarkan ListView menangani seleksi ke item baru
+                CategoriesList.SelectedItem = e.ClickedItem;
+            }
         }
     }
 }
