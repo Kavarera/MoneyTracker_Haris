@@ -7,19 +7,19 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:customCtrl="using:MoneyTracker.WinUI.Components"
-    xmlns:utils="using:MoneyTracker.WinUI.Utils"
-
+    xmlns:utils="using:MoneyTracker.WinUI.Utils" xmlns:dto="using:MoneyTracker.Application.DTO"
     mc:Ignorable="d"
     Title="Dashboard">
 
     <Grid>
+        <Grid.Resources>
+            <utils:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        </Grid.Resources>
         <SplitView x:Name="splitView" PaneBackground="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}"
            IsPaneOpen="{x:Bind _viewModel.IsSplitPaneOpen, Mode=OneWay}" OpenPaneLength="256" CompactPaneLength="56" DisplayMode="CompactInline">
             <SplitView.Pane >
                 <Grid>
-                    <Grid.Resources>
-                        <utils:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
-                    </Grid.Resources>
+                    
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
@@ -43,7 +43,9 @@
                         </Button.Resources>
                     </customCtrl:HandButton>
 
-                    <Grid Grid.Row="2">
+                    <Grid Grid.Row="2" x:Name="GridAccounts" Loaded="{x:Bind _viewModel.LoadAsync}"
+                          Visibility="{Binding IsSplitPaneOpen, Converter={StaticResource BoolToVisibilityConverter}}">
+
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
@@ -52,8 +54,20 @@
                         </Grid.RowDefinitions>
                         
                         <!--Account List-->
-                        <TextBlock Grid.Row="0" Text="Accounts" Margin="10,20"/>
-                        
+                        <TextBlock Grid.Row="0" Text="Accounts" Margin="10,5" FontWeight="SemiBold" FontSize="18"/>
+                        <ProgressRing Grid.Row="1" IsActive="True" Width="32" Height="32" HorizontalAlignment="Center"
+                                      Margin="0,16,0,0"
+                                      Visibility="{Binding IsLoadingData, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+                        <ListView Grid.Row="1" ItemsSource="{x:Bind _viewModel.Accounts}"
+                                  Visibility="{Binding IsNotLoadingData, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <ListView.ItemTemplate>
+                                <DataTemplate x:DataType="dto:AccountDTO">
+                                    <TextBlock Text="{Binding Name}"/>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+
 
                     </Grid>
                 </Grid>

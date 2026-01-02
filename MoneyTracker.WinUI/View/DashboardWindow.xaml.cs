@@ -30,7 +30,6 @@ namespace MoneyTracker.WinUI.View
                 appWindow.SetPresenter(AppWindowPresenterKind.FullScreen);
             }
 
-            
         }
     }
 }

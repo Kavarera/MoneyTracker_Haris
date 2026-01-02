@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MoneyTracker.Application.Command;
+using MoneyTracker.Application.Usecase;
 using MoneyTracker.Infrastructure;
 using MoneyTracker.WinUI.Services;
 using MoneyTracker.WinUI.ViewModel;
@@ -39,6 +40,8 @@ namespace MoneyTracker.WinUI
                 //Dashboard Window
                 services.AddTransient<DashboardWindowViewModel>();
 
+                //UseCase
+                services.AddTransient<GetAccounts>(); 
 
                 //Infrastructure Layer
                 services.AddInfrastructure();

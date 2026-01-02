@@ -51,9 +51,9 @@ namespace MoneyTracker.Infrastructure.Persistence
                 entity.Property(e => e.CreateByUser).IsRequired();
                 entity.Property(e => e.TransactionDate).IsRequired();
                 entity.Property(e => e.Status).IsRequired().HasConversion(
-                    v => v == TransactionStatus.Reconciled ? 'R' : 'U',
-                    v => v == 'R' ? TransactionStatus.Reconciled : TransactionStatus.Unreconciled)
-                .HasDefaultValue('U').HasMaxLength(1);
+                    v => v == TransactionStatus.Reconciled ? "R" : "U",
+                    v => v == "R" ? TransactionStatus.Reconciled : TransactionStatus.Unreconciled)
+                .HasDefaultValue(TransactionStatus.Unreconciled).HasMaxLength(1);
                 
                 entity.Property(e => e.Kredit).HasDefaultValue(0);
                 entity.Property(e => e.Debit).HasDefaultValue(0);
