@@ -1,18 +1,21 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml;
 using MoneyTracker.Application.DTO;
 using MoneyTracker.Application.Usecase;
+using MoneyTracker.WinUI.View;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MoneyTracker.WinUI.ViewModel
 {
-    public partial class DashboardWindowViewModel : ObservableObject
+    public partial class DashboardWindowViewModel : ObservableObject, IDisposable
     {
         private readonly ILogger<DashboardWindowViewModel> _log;
 
@@ -130,6 +133,32 @@ namespace MoneyTracker.WinUI.ViewModel
         {
             _log.LogInformation("Toggle Split Pane Changed");
             IsSplitPaneOpen = !IsSplitPaneOpen;
+        }
+
+        [RelayCommand]
+        public void ChangeConnection()
+        {
+            try
+            {
+                // Buat window baru
+                var vm = AppHostManager.AppHost.Services.GetRequiredService<ConnectionViewModel>();
+                var connectionWindow = new ConnectionWindow(vm);
+
+                // Tutup window lama
+                App.MainWindow?.Close();
+
+                // Set MainWindow baru
+                App.MainWindow = connectionWindow;
+                connectionWindow.Activate();
+
+                // Dispose ViewModel lama dengan cleanup
+                Dispose();
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Failed to change connection");
+            }
+
         }
 
         public void RefreshFilteredTransactions()
@@ -283,7 +312,7 @@ namespace MoneyTracker.WinUI.ViewModel
         }
 
 
-        public async void ReadCsvCategories(Windows.Storage.StorageFile file)
+        public async Task ReadCsvCategories(Windows.Storage.StorageFile file)
         {
             if(file== null)
             {
@@ -306,7 +335,7 @@ namespace MoneyTracker.WinUI.ViewModel
             }
         }
 
-        public async void ReadCsvAccounts(Windows.Storage.StorageFile file)
+        public async Task ReadCsvAccounts(Windows.Storage.StorageFile file)
         {
             if (file == null)
             {
@@ -330,7 +359,7 @@ namespace MoneyTracker.WinUI.ViewModel
             }
         }
 
-        public async void ReadCsvTransactions(Windows.Storage.StorageFile file)
+        public async Task ReadCsvTransactions(Windows.Storage.StorageFile file)
         {
             if (file == null)
             {
@@ -365,11 +394,33 @@ namespace MoneyTracker.WinUI.ViewModel
                 a.Debit == b.Debit;
         }
 
-
-
-        internal void Dispose()
+        public void Dispose()
         {
-            throw new NotImplementedException();
+            if (_disposed) return;
+
+            // Cancel any ongoing async operations
+            _cts.Cancel();
+            _cts.Dispose();
+
+            // Clear ObservableCollections
+            Accounts.Clear();
+            Categories.Clear();
+            Transactions.Clear();
+            AllTransactions.Clear();
+            FilteredTransactions.Clear();
+            Snapshot.Clear();
+
+            // Null references untuk membantu GC
+            _selectedAccount = null;
+            _selectedCategory = null;
+
+            // Log kalau perlu
+            _log.LogInformation("DashboardWindowViewModel disposed.");
         }
+
+        private bool _disposed = false;
+        private readonly CancellationTokenSource _cts = new();
+
+       
     }
 }

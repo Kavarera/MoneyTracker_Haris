@@ -41,6 +41,7 @@
                     <customCtrl:HandButton Grid.Row="1" Content="Change Connection" x:Name="ChangeConnectionButton" Margin="20, 20"
                         HorizontalAlignment="Stretch"
                         BorderBrush="Red" BorderThickness="2" CornerRadius="8"
+                                           Click="{x:Bind ViewModel.ChangeConnection}"
                         Visibility="{Binding IsSplitPaneOpen, Converter={StaticResource BoolToVisibilityConverter}}">
                         <!--Atur style button-->
                         <Button.Resources>
@@ -192,8 +193,6 @@
                         </DropDownButton.Flyout>
                     </customCtrl:HandDropDownButton>
                     <StackPanel Grid.Column="1" Margin="20,0" Orientation="Horizontal" Spacing="20" HorizontalAlignment="Center">
-                        <ComboBox
-                            ItemsSource="{x:Bind ViewModel.Categories}"/>
                         <!--Tombol Filter Inner-->
                         <customCtrl:HandDropDownButton Margin="5,20,0,0" Background="Transparent" BorderBrush="Transparent"  >
                             <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE71C;" Foreground="Cyan">
