@@ -27,8 +27,9 @@ namespace MoneyTracker.Infrastructure.Service
                 var lines = await File.ReadAllLinesAsync(path, ct);
                 if (lines.Length < 2) return;
 
-                // 1. Ambil semua Account dan Category ke memory agar tidak query berulang kali di dalam loop (Performa)
-                var accountMap = await _db.Accounts.ToDictionaryAsync(a => a.AccountName, a => a.Id, ct);
+                // 1. Ambil data Account (objek utuh) dan Category (ID saja) ke memory
+                // Kita ambil objek Account utuh agar bisa update saldo secara massal
+                var accounts = await _db.Accounts.ToDictionaryAsync(a => a.AccountName, ct);
                 var categoryMap = await _db.Categories.ToDictionaryAsync(c => c.CategoryName, c => c.Id, ct);
 
                 var transactions = new List<TransactionEntity>();
@@ -43,33 +44,37 @@ namespace MoneyTracker.Infrastructure.Service
 
                     try
                     {
-                        // Kolom CSV: DateTransaction[0]; Account[1]; Category[2]; Note[3]; Kredit[4]; Debit[5]
                         string accountName = fields[1].Trim();
                         string categoryName = fields[2].Trim();
 
-                        // Validasi apakah Account & Category ada di DB
-                        if (!accountMap.TryGetValue(accountName, out int accId) ||
+                        // Validasi
+                        if (!accounts.TryGetValue(accountName, out var account) ||
                             !categoryMap.TryGetValue(categoryName, out int catId))
                         {
-                            _logger.LogWarning($"Baris {i + 1} dilewati: Account '{accountName}' atau Category '{categoryName}' tidak ditemukan di Database.");
+                            _logger.LogWarning($"Baris {i + 1} skip: Account/Category '{accountName}'/'{categoryName}' tidak ada.");
                             continue;
                         }
 
+                        // Parse nilai numerik
+                        decimal kredit = decimal.Parse(fields[4].Trim().Replace(",", ""));
+                        decimal debit = decimal.Parse(fields[5].Trim().Replace(",", ""));
+
                         var transaction = new TransactionEntity
                         {
-                            TransactionDate = DateTime.Parse(fields[0].Trim()), // Format: 1 Jan 2025
-                            AccountId = accId,
+                            TransactionDate = DateTime.SpecifyKind(DateTime.Parse(fields[0].Trim()), DateTimeKind.Utc),
+                            AccountId = account.Id,
                             CategoryId = catId,
                             Note = fields[3].Trim(),
-                            // Parse angka dengan format ribuan Indonesia (koma)
-                            Kredit = decimal.Parse(fields[4].Trim().Replace(",", "")),
-                            Debit = decimal.Parse(fields[5].Trim().Replace(",", "")),
-
-                            // Default values
+                            Kredit = kredit,
+                            Debit = debit,
                             Status = Domain.Enums.TransactionStatus.Unreconciled,
-                            CreateByUser = "System_CSV_Import",
-                            UpdatedByUser = "System_CSV_Import",
+                            // Kita simpan balance setelah transaksi (optional, tapi bagus untuk audit)
+                            LastBalance = account.Amount + kredit - debit
                         };
+
+                        // 2. Update saldo di objek account yang ada di memory
+                        account.Amount += kredit;
+                        account.Amount -= debit;
 
                         transactions.Add(transaction);
                     }
@@ -81,9 +86,14 @@ namespace MoneyTracker.Infrastructure.Service
 
                 if (transactions.Any())
                 {
+                    // 3. Simpan perubahan transaksi
                     await _db.Transactions.AddRangeAsync(transactions, ct);
+
+                    // EF Core otomatis mendeteksi perubahan 'Amount' pada objek 'account' 
+                    // karena objek tersebut diambil dari _db.Accounts tadi.
                     await _db.SaveChangesAsync(ct);
-                    _logger.LogInformation($"{transactions.Count} transaksi berhasil diimpor.");
+
+                    _logger.LogInformation($"{transactions.Count} transaksi berhasil diimpor dan saldo diupdate.");
                 }
             }
             catch (Exception ex)
