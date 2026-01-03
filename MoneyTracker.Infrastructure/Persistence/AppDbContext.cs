@@ -4,7 +4,7 @@ using MoneyTracker.Domain.Enums;
 
 namespace MoneyTracker.Infrastructure.Persistence
 {
-    internal class AppDbContext : DbContext
+    public class AppDbContext : DbContext
     {
         public AppDbContext(DbContextOptions<AppDbContext> options)
         : base(options)
@@ -39,6 +39,8 @@ namespace MoneyTracker.Infrastructure.Persistence
                 entity.Property(e => e.Id).ValueGeneratedOnAdd();
                 entity.Property(e => e.CategoryName).IsRequired().HasMaxLength(200);
                 entity.Property(e => e.CreatedDate).HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.Property(e => e.UpdatedByUser).ValueGeneratedOnUpdate().HasDefaultValueSql("CURRENT_USER");
+                entity.Property(e => e.UpdatedDate).ValueGeneratedOnUpdate().HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                 entity.HasIndex(e => e.CategoryName).IsUnique();
             });

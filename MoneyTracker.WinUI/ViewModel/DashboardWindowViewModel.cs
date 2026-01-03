@@ -18,6 +18,7 @@ namespace MoneyTracker.WinUI.ViewModel
 
         private readonly GetAccounts _getAccounts;
         private readonly GetCategories _getCategories;
+        private readonly ImportCategories _importCategories;
 
         public ObservableCollection<AccountDTO> Accounts { get; } = new();
         public ObservableCollection<CategoryDTO> Categories { get; } = new();
@@ -36,11 +37,12 @@ namespace MoneyTracker.WinUI.ViewModel
         }
 
 
-        public DashboardWindowViewModel(ILogger<DashboardWindowViewModel> logger, GetAccounts getAccounts, GetCategories getCategories)
+        public DashboardWindowViewModel(ILogger<DashboardWindowViewModel> logger, GetAccounts getAccounts, GetCategories getCategories, ImportCategories importCategories)
         {
             _log = logger;
             _getAccounts = getAccounts;
             _getCategories = getCategories;
+            _importCategories = importCategories;
         }
 
         [RelayCommand]
@@ -101,6 +103,12 @@ namespace MoneyTracker.WinUI.ViewModel
             {
                 IsLoadingData = false;
             }
+        }
+
+        public async void ReadCsv(Windows.Storage.StorageFile file)
+        {
+            await _importCategories.ExecuteAsync(file.Path.ToString());
+            //then refresh the data
         }
 
         internal void Dispose()

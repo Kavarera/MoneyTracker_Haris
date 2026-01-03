@@ -166,7 +166,7 @@
                         </customCtrl:HandDropDownButton.Resources>
                         <DropDownButton.Flyout>
                             <MenuFlyout Placement="Bottom">
-                                <MenuFlyoutItem Text="Categories"/>
+                                <MenuFlyoutItem x:Name="ImportCategoriesMFItem" Text="Categories" Click="ImportCategoriesMFItem_Click"/>
                                 <MenuFlyoutItem Text="Accounts"/>
                                 <MenuFlyoutItem Text="Transactions"/>
                             </MenuFlyout>

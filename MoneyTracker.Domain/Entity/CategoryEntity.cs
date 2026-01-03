@@ -7,7 +7,7 @@ namespace MoneyTracker.Domain.Entity
         public int Id { get; set; }
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedDate { get; set; }
-        public required string UpdatedByUser { get; set; }
+        public string UpdatedByUser { get; set; } = "";
         public required string CategoryName { get; set; }
         public required string Note { get; set; } = string.Empty;
 

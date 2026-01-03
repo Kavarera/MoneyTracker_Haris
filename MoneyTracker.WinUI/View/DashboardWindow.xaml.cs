@@ -152,5 +152,14 @@ namespace MoneyTracker.WinUI.View
         {
             accountsListSettings.SelectedItems.Clear();
         }
+
+        private async void ImportCategoriesMFItem_Click(object sender, RoutedEventArgs e)
+        {
+            var picker = new Windows.Storage.Pickers.FileOpenPicker();
+            picker.FileTypeFilter.Add(".csv");
+            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
+            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
+            await picker.PickSingleFileAsync();
+        }
     }
 }
