@@ -131,7 +131,8 @@ namespace MoneyTracker.WinUI.ViewModel
                 }
                 foreach(var item in itemTransactions)
                 {
-                    _log.LogInformation($"DATA TRABNSAKSI = {item.Description}");
+                    _log.LogInformation($"DATA TRABNSAKSI = {item.Description} - {item.Status}");
+                    Transactions.Add(item);
                 }
 
                 // beri tahu UI bahwa DisplayCategories DisplayAccounts berubah

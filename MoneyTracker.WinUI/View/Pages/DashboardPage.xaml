@@ -158,7 +158,7 @@
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <Grid Grid.Row="0" Margin="10,20">
                     <Grid.ColumnDefinitions>
@@ -214,7 +214,7 @@
     AutoGenerateColumns="False"
     Margin="12"
     IsReadOnly="{x:Bind ViewModel.IsEditMode, Mode=OneWay, Converter={StaticResource InverseBoolConverter}}"
-    SelectionMode="Single"
+    SelectionMode="Single" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollMode="Enabled"
     RowHeight="48">
 
                         <controls:DataGrid.Columns>
@@ -276,8 +276,8 @@
                                     <DataTemplate x:DataType="dto:TransactionDTO">
                                         <ComboBox 
                         SelectedValue="{x:Bind Status, Mode=TwoWay}">
-                                            <x:String>U</x:String>
-                                            <x:String>R</x:String>
+                                            <x:String>Reconciled</x:String>
+                                            <x:String>Unreconciled</x:String>
                                         </ComboBox>
                                     </DataTemplate>
                                 </controls:DataGridTemplateColumn.CellEditingTemplate>
@@ -285,7 +285,7 @@
 
 
                             <!-- 🏷 CATEGORY -->
-                            <controls:DataGridTemplateColumn Header="Category" Width="150">
+                            <controls:DataGridTemplateColumn Header="Category" Width="*">
                                 <controls:DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate x:DataType="dto:TransactionDTO">
                                         <TextBlock Text="{x:Bind CategoryName}"/>
@@ -305,7 +305,7 @@
 
 
                             <!-- ➕ CREDIT -->
-                            <controls:DataGridTemplateColumn Header="Credit" Width="120">
+                            <controls:DataGridTemplateColumn Header="Credit" Width="*">
                                 <controls:DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate x:DataType="dto:TransactionDTO">
                                         <TextBlock 
@@ -329,7 +329,7 @@
 
 
                             <!-- ➖ DEBIT -->
-                            <controls:DataGridTemplateColumn Header="Debit" Width="120">
+                            <controls:DataGridTemplateColumn Header="Debit" Width="*">
                                 <controls:DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate x:DataType="dto:TransactionDTO">
                                         <TextBlock 
@@ -355,7 +355,7 @@
                             <!-- 🏦 BALANCE (READ ONLY) -->
                             <controls:DataGridTextColumn
             Header="Balance"
-            Binding="{Binding LastBalance}"
+            Binding="{Binding LastBalance}" Width="*"
             IsReadOnly="True"/>
                         </controls:DataGrid.Columns>
 

@@ -21,7 +21,8 @@ namespace MoneyTracker.Application.Usecase
             // contoh filtering / sorting dll
             return transactions
                 .OrderBy(c => c.CreatedDate)
-                .Select(c => new TransactionDTO(c.Id,c.TransactionDate,c.Note,c.Kredit,c.Debit,c.LastBalance,c.Category.CategoryName, c.CategoryId,c.Status.ToString()))
+                .Select(c => new TransactionDTO(c.Id, c.TransactionDate, c.Note, c.Kredit,c.Debit,c.LastBalance,c.Category.CategoryName, 
+                c.CategoryId,c.Status == Domain.Enums.TransactionStatus.Reconciled ? "R" : "U")).OrderByDescending(c=>c.TransactionDate)
                 .ToList();
         }
     }
