@@ -108,8 +108,8 @@ namespace MoneyTracker.WinUI.View
             var dashboard = new DashboardWindow(
                 AppHostManager.AppHost.Services.GetRequiredService<DashboardWindowViewModel>()
             );
-
             dashboard.Activate();
+            App.MainWindow = dashboard;
 
             // tutup window ini
             this.Close();

@@ -1,7 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
-using Microsoft.UI.Xaml;
 using MoneyTracker.Application.DTO;
 using MoneyTracker.Application.Usecase;
 using System;
@@ -24,12 +23,43 @@ namespace MoneyTracker.WinUI.ViewModel
 
         public ObservableCollection<AccountDTO> Accounts { get; } = new();
         public ObservableCollection<CategoryDTO> Categories { get; } = new();
+        public ObservableCollection<TransactionDTO> Transactions { get; } = new();
+
+        
+
         public IEnumerable<CategoryDTO> DisplayCategories => Categories.Where(c => c.IsDisplay);
         public IEnumerable<AccountDTO> DisplayAccounts => Accounts.Where(c => c.IsDisplay);
 
         [ObservableProperty] private bool _isSplitPaneOpen = true;
 
         [ObservableProperty] private bool _isLoadingData = false;
+        [ObservableProperty] private bool _isEditMode = false;
+        [ObservableProperty]
+        private string _editButtonContent = "Edit Mode";
+
+        
+        public void ToggleEditMode()
+        {
+            IsEditMode = !IsEditMode;
+            EditButtonContent = IsEditMode ? "Save Changes" : "Edit Mode";
+            _log.LogInformation($"Toggle Edit Mode Clicked = {IsEditMode}");
+
+            if (!IsEditMode) SaveToDatabase();
+        }
+
+        private async void SaveToDatabase()
+        {
+            // Pastikan semua DateTime adalah UTC sebelum dikirim ke PostgreSQL
+            foreach (var t in Transactions)
+            {
+                // Logika konversi Status "Reconciled" -> "R" biasanya dihandle di DB Context
+                // Tapi pastikan Kind Date adalah UTC agar tidak error lagi
+                t.TransactionDate = DateTime.SpecifyKind(t.TransactionDate, DateTimeKind.Utc);
+            }
+
+            //await _db.SaveChangesAsync();
+            // Berikan notifikasi sukses jika perlu
+        }
 
         public bool IsNotLoadingData => !IsLoadingData;
 

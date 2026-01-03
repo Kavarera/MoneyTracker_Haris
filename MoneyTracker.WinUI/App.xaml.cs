@@ -12,6 +12,7 @@ namespace MoneyTracker.WinUI
     
     public partial class App : Microsoft.UI.Xaml.Application
     {
+        public static Window MainWindow { get; set; }
         public App()
         {
             this.InitializeComponent();
@@ -21,6 +22,7 @@ namespace MoneyTracker.WinUI
         {
             await AppHostManager.StartAsync();
             m_window = new ConnectionWindow(AppHostManager.AppHost.Services.GetRequiredService<ConnectionViewModel>());
+            MainWindow = m_window;
             m_window.Activate();
         }
 
