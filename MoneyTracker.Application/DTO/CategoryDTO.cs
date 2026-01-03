@@ -11,7 +11,7 @@ namespace MoneyTracker.Application.DTO
         {
             Id = id;
             CategoryName = categoryName;
-            IsDisplay = id < 2;
+            IsDisplay = true;
         }
     }
 }

@@ -18,6 +18,8 @@
         <utils:TransactionUiConverter x:Key="UiConverter"/>
         <utils:InverseBoolConverter x:Key="InverseBoolConverter"/>
         <utils:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+
+        <CollectionViewSource x:Key="CategoriesProxy" Source="{x:Bind ViewModel.DisplayCategories, Mode=OneWay}"/>
     </Page.Resources>
 
     <Grid>
@@ -347,10 +349,12 @@
                                 </controls:DataGridTemplateColumn.CellTemplate>
 
                                 <controls:DataGridTemplateColumn.CellEditingTemplate>
-                                    <DataTemplate>
+                                    <DataTemplate x:DataType="dto:TransactionDTO">
                                         <ComboBox x:Name="EditCategoryDataGridComboBox"
-                                                  ItemsSource="{x:Bind RootPage.ViewModel.DisplayCategories, Mode=OneWay}"
-                                                  DisplayMemberPath="CategoryName"/>
+                                                 ItemsSource="{Binding Source={StaticResource CategoriesProxy}}"
+                                                  SelectedValue="{x:Bind CategoryId, Mode=TwoWay}"
+                                                  SelectedValuePath="Id"
+                                                  DisplayMemberPath="CategoryName" HorizontalAlignment="Stretch"/>
                                     </DataTemplate>
                                 </controls:DataGridTemplateColumn.CellEditingTemplate>
 

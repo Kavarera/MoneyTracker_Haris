@@ -25,7 +25,10 @@ namespace MoneyTracker.WinUI.ViewModel
         private readonly SaveTransactions _saveTransactions;
 
         public ObservableCollection<AccountDTO> Accounts { get; } = new();
-        public ObservableCollection<CategoryDTO> Categories { get; } = new();
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(DisplayCategories))] // Tambahkan ini
+        private ObservableCollection<CategoryDTO> _categories = new();
+        //public ObservableCollection<CategoryDTO> Categories { get; } = new();
         public ObservableCollection<TransactionDTO> Transactions { get; } = new();
         public ObservableCollection<TransactionDTO> AllTransactions { get; } = new();
         public ObservableCollection<TransactionDTO> FilteredTransactions { get; } = new();
