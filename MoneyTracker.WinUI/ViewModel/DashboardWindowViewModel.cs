@@ -81,6 +81,7 @@ namespace MoneyTracker.WinUI.ViewModel
                 // Logika konversi Status "Reconciled" -> "R" biasanya dihandle di DB Context
                 // Tapi pastikan Kind Date adalah UTC agar tidak error lagi
                 t.TransactionDate = DateTime.SpecifyKind(t.TransactionDate, DateTimeKind.Utc);
+                t.Status = t.Status.Trim().First().ToString();
                 var original = Snapshot.First(x => x.Id == t.Id);
                 _log.LogInformation($"IS EQUAL = {AreEqual(original, t)}");
                 if (!AreEqual(original, t))

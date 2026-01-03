@@ -282,40 +282,147 @@ namespace MoneyTracker.WinUI.View.Pages
         {
             if (e.EditAction == CommunityToolkit.WinUI.UI.Controls.DataGridEditAction.Commit)
             {
-                // Cara mengambil elemen ComboBox yang sedang aktif di sel tersebut:
-                FrameworkElement cellContent = e.Column.GetCellContent(e.Row);
-
-                // Cari ComboBox di dalam content tersebut
-                ComboBox comboBox = cellContent as ComboBox;
-
-                // Jika tidak ketemu langsung (karena di dalam DataTemplate), kita cari secara manual
-                if (comboBox == null && cellContent is Panel panel)
+                // 1. Ambil DTO-nya dulu
+                if (e.Row.DataContext is TransactionDTO editedTransaction)
                 {
-                    comboBox = panel.Children.OfType<ComboBox>().FirstOrDefault();
-                }
+                    var cellContent = e.Column.GetCellContent(e.Row);
+                    string header = e.Column.Header.ToString();
 
-                if (comboBox != null && e.Row.DataContext is TransactionDTO editedTransaction)
-                {
-                    // Pastikan SelectedValue tidak null sebelum di-cast
-                    if (comboBox.SelectedValue != null)
+                    // 2. Logika manual untuk kolom yang "bandel"
+                    if (header == "Transaction Date")
                     {
-                        var newCategoryId = (int)comboBox.SelectedValue;
-
-                        // Cari di daftar kategori asli
-                        var category = ViewModel.Categories.FirstOrDefault(c => c.Id == newCategoryId);
-
-                        if (category != null)
+                        var datePicker = FindChildOfType<CalendarDatePicker>(cellContent);
+                        if (datePicker?.Date != null)
                         {
-                            editedTransaction.CategoryId = category.Id;
-                            editedTransaction.CategoryName = category.CategoryName;
-
-                            log.LogInformation($"Berhasil update ke: {category.CategoryName}");
+                            editedTransaction.TransactionDate = datePicker.Date.Value.DateTime;
                         }
                     }
+                    else if (header == "Status")
+                    {
+                        var comboBox = FindChildOfType<ComboBox>(cellContent);
+                        if (comboBox?.SelectedItem is string newStatus)
+                        {
+                            log.LogInformation($"new status = {newStatus}");
+                            editedTransaction.Status = newStatus.Split().First().ToString();
+                        }
+                    }
+                    // Tambahkan logika Category/Account di sini juga jika belum jalan
                 }
 
-                // Paksa refresh UI agar TextBlock di CellTemplate muncul dengan nama baru
+                // 3. JURUS PAMUNGKAS (Pindahkan ke paling bawah)
+                // Reset DataContext baris ini untuk memaksa SEMUA TextBlock (Status, Date, dll) menggambar ulang
+                var currentData = e.Row.DataContext;
+                e.Row.DataContext = null;
+                e.Row.DataContext = currentData;
+
+                // 4. Refresh List (Opsional tapi bagus untuk totalitas)
                 ViewModel.RefreshFilteredTransactions();
+
+                log.LogInformation("Update data and UI refresh completed.");
+            }
+
+            //if (e.EditAction == CommunityToolkit.WinUI.UI.Controls.DataGridEditAction.Commit)
+            //{
+            //    // TRIK SAKTI: Reset DataContext baris ini agar TextBlock membaca ulang {Binding Status}
+            //    var rowData = e.Row.DataContext;
+            //    e.Row.DataContext = null;
+            //    e.Row.DataContext = rowData;
+
+            //    log.LogInformation("Row UI Refreshed");
+            //}
+            //if (e.EditAction == CommunityToolkit.WinUI.UI.Controls.DataGridEditAction.Commit)
+            //{
+            //    if (e.Row.DataContext is TransactionDTO editedTransaction)
+            //    {
+            //        // Ambil elemen visual dari sel yang baru saja diedit
+            //        var cellContent = e.Column.GetCellContent(e.Row);
+
+            //        if (e.Column.Header.ToString() == "Transaction Date")
+            //        {
+            //            // Ambil CalendarDatePicker dari dalam DataTemplate
+            //            var datePicker = cellContent as CalendarDatePicker;
+
+            //            // Jika datePicker null, kemungkinan dia dibungkus Panel/Grid
+            //            if (datePicker == null && cellContent is FrameworkElement fe)
+            //            {
+            //                // Cari ke bawah hirarki visual
+            //                datePicker = FindChildOfType<CalendarDatePicker>(cellContent);
+            //            }
+
+            //            if (datePicker != null && datePicker.Date.HasValue)
+            //            {
+            //                // AMBIL NILAI LANGSUNG DARI UI DAN MASUKKAN KE DTO
+            //                editedTransaction.TransactionDate = datePicker.Date.Value.DateTime;
+            //                log.LogInformation($"Berhasil dipaksa update: {editedTransaction.TransactionDate}");
+            //            }
+            //        }
+            //    }
+
+            //    // PENTING: Picu refresh agar TextBlock di CellTemplate baca ulang
+            //    ViewModel.RefreshFilteredTransactions();
+            //}
+            //------
+
+            //if (e.EditAction == CommunityToolkit.WinUI.UI.Controls.DataGridEditAction.Commit)
+            //{
+            //    // Cara mengambil elemen ComboBox yang sedang aktif di sel tersebut:
+            //    FrameworkElement cellContent = e.Column.GetCellContent(e.Row);
+
+            //    // Cari ComboBox di dalam content tersebut
+            //    ComboBox comboBox = cellContent as ComboBox;
+
+            //    // Jika tidak ketemu langsung (karena di dalam DataTemplate), kita cari secara manual
+            //    if (comboBox == null && cellContent is Panel panel)
+            //    {
+            //        comboBox = panel.Children.OfType<ComboBox>().FirstOrDefault();
+            //    }
+
+            //    if (comboBox != null && e.Row.DataContext is TransactionDTO editedTransaction)
+            //    {
+            //        // Pastikan SelectedValue tidak null sebelum di-cast
+            //        if (comboBox.SelectedValue != null)
+            //        {
+            //            var newCategoryId = (int)comboBox.SelectedValue;
+
+            //            // Cari di daftar kategori asli
+            //            var category = ViewModel.Categories.FirstOrDefault(c => c.Id == newCategoryId);
+
+            //            if (category != null)
+            //            {
+            //                editedTransaction.CategoryId = category.Id;
+            //                editedTransaction.CategoryName = category.CategoryName;
+
+            //                log.LogInformation($"Berhasil update ke: {category.CategoryName}");
+            //            }
+            //        }
+            //    }
+
+            //    // Paksa refresh UI agar TextBlock di CellTemplate muncul dengan nama baru
+            //    ViewModel.RefreshFilteredTransactions();
+            //}
+        }
+
+        private void CalendarDatePicker_DateChanged(CalendarDatePicker sender, CalendarDatePickerDateChangedEventArgs args)
+        {
+            // Cari data item yang sedang dipegang oleh baris ini
+            if (sender.DataContext is TransactionDTO editedTransaction && args.NewDate.HasValue)
+            {
+                // Update langsung ke DTO-nya saat itu juga
+                editedTransaction.TransactionDate = args.NewDate.Value.DateTime;
+                log.LogInformation($"DateChanged Triggered: {editedTransaction.TransactionDate}");
+            }
+        }
+
+        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (sender is ComboBox comboBox && comboBox.DataContext is TransactionDTO editedTransaction)
+            {
+                // Ambil string yang dipilih ("Reconciled" atau "Unreconciled")
+                if (comboBox.SelectedItem is string newStatus)
+                {
+                    editedTransaction.Status = newStatus.Split().First().ToString();
+                    log.LogInformation($"Status manual update: {newStatus}");
+                }
             }
         }
     }

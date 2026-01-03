@@ -9,7 +9,6 @@ namespace MoneyTracker.Application.Usecase
     public class SaveTransactions
     {
         private readonly ITransactionsRepository repo;
-
         public SaveTransactions(ITransactionsRepository repo)
         {
             this.repo = repo;
@@ -17,6 +16,7 @@ namespace MoneyTracker.Application.Usecase
 
         public async Task ExecuteAsync(IEnumerable<TransactionDTO> dtos)
         {
+
                 var transactions = dtos.Select(dto =>
                     new TransactionEntity {
                         Id = dto.Id,

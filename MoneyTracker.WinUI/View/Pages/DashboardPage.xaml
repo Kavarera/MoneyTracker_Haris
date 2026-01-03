@@ -276,17 +276,17 @@
                                 <controls:DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate x:DataType="dto:TransactionDTO">
                                         <TextBlock 
-                        Text="{x:Bind TransactionDate, Converter={StaticResource DateConverter}}"
+                        Text="{Binding TransactionDate, Converter={StaticResource DateConverter}}"
                         VerticalAlignment="Center"/>
                                     </DataTemplate>
                                 </controls:DataGridTemplateColumn.CellTemplate>
 
                                 <controls:DataGridTemplateColumn.CellEditingTemplate>
                                     <DataTemplate x:DataType="dto:TransactionDTO">
-                                        <CalendarDatePicker
+                                        <CalendarDatePicker 
                         Date="{x:Bind utils:UnitConverter.DateTimeToOffset(TransactionDate),
                                BindBack=utils:UnitConverter.OffsetToDateTime,
-                               Mode=TwoWay}"
+                               Mode=TwoWay}" DateChanged="CalendarDatePicker_DateChanged"
                         HorizontalAlignment="Stretch"/>
                                     </DataTemplate>
                                 </controls:DataGridTemplateColumn.CellEditingTemplate>
@@ -319,14 +319,14 @@
                             <!-- 📌 STATUS -->
                             <controls:DataGridTemplateColumn Header="Status" Width="130">
                                 <controls:DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate x:DataType="dto:TransactionDTO">
-                                        <TextBlock Text="{x:Bind Status}" FontStyle="Italic" HorizontalAlignment="Center"/>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Status}" FontStyle="Italic" HorizontalAlignment="Center"/>
                                     </DataTemplate>
                                 </controls:DataGridTemplateColumn.CellTemplate>
 
                                 <controls:DataGridTemplateColumn.CellEditingTemplate>
                                     <DataTemplate x:DataType="dto:TransactionDTO">
-                                        <ComboBox 
+                                        <ComboBox  SelectionChanged="ComboBox_SelectionChanged"
                         SelectedValue="{x:Bind Status, Mode=TwoWay}">
                                             <x:String>Reconciled</x:String>
                                             <x:String>Unreconciled</x:String>
@@ -363,10 +363,10 @@
                                 <controls:DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate x:DataType="dto:TransactionDTO">
                                         <TextBlock 
-                        Text="{x:Bind Kredit}"
-                        Foreground="Green"
-                        FontWeight="Bold"
-                        HorizontalAlignment="Right"/>
+                                            Text="{x:Bind Kredit}"
+                                            Foreground="Green"
+                                            FontWeight="Bold"
+                                            HorizontalAlignment="Right"/>
                                     </DataTemplate>
                                 </controls:DataGridTemplateColumn.CellTemplate>
 
@@ -375,7 +375,7 @@
                                         <NumberBox
                         Value="{x:Bind utils:UnitConverter.DecimalToDouble(Kredit),
                                         BindBack=utils:UnitConverter.DoubleToDecimal,
-                                        Mode=TwoWay}"
+                                        Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                         SpinButtonPlacementMode="Compact"/>
                                     </DataTemplate>
                                 </controls:DataGridTemplateColumn.CellEditingTemplate>
@@ -399,7 +399,7 @@
                                         <NumberBox
                         Value="{x:Bind utils:UnitConverter.DecimalToDouble(Debit),
                                         BindBack=utils:UnitConverter.DoubleToDecimal,
-                                        Mode=TwoWay}"
+                                        Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                         SpinButtonPlacementMode="Compact"/>
                                     </DataTemplate>
                                 </controls:DataGridTemplateColumn.CellEditingTemplate>
