@@ -9,6 +9,7 @@ using Microsoft.UI.Xaml.Media;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using System.Linq;
+using CommunityToolkit.WinUI.UI.Controls;
 
 
 namespace MoneyTracker.WinUI.View.Pages
@@ -275,6 +276,47 @@ namespace MoneyTracker.WinUI.View.Pages
             }
 
             return null;
+        }
+
+        private void DataGrid_CellEditEnded(object sender, CommunityToolkit.WinUI.UI.Controls.DataGridCellEditEndedEventArgs e)
+        {
+            if (e.EditAction == CommunityToolkit.WinUI.UI.Controls.DataGridEditAction.Commit)
+            {
+                // Cara mengambil elemen ComboBox yang sedang aktif di sel tersebut:
+                FrameworkElement cellContent = e.Column.GetCellContent(e.Row);
+
+                // Cari ComboBox di dalam content tersebut
+                ComboBox comboBox = cellContent as ComboBox;
+
+                // Jika tidak ketemu langsung (karena di dalam DataTemplate), kita cari secara manual
+                if (comboBox == null && cellContent is Panel panel)
+                {
+                    comboBox = panel.Children.OfType<ComboBox>().FirstOrDefault();
+                }
+
+                if (comboBox != null && e.Row.DataContext is TransactionDTO editedTransaction)
+                {
+                    // Pastikan SelectedValue tidak null sebelum di-cast
+                    if (comboBox.SelectedValue != null)
+                    {
+                        var newCategoryId = (int)comboBox.SelectedValue;
+
+                        // Cari di daftar kategori asli
+                        var category = ViewModel.Categories.FirstOrDefault(c => c.Id == newCategoryId);
+
+                        if (category != null)
+                        {
+                            editedTransaction.CategoryId = category.Id;
+                            editedTransaction.CategoryName = category.CategoryName;
+
+                            log.LogInformation($"Berhasil update ke: {category.CategoryName}");
+                        }
+                    }
+                }
+
+                // Paksa refresh UI agar TextBlock di CellTemplate muncul dengan nama baru
+                ViewModel.RefreshFilteredTransactions();
+            }
         }
     }
 }

@@ -261,7 +261,7 @@
 
                 <Grid Grid.Row="1">
 
-                    <controls:DataGrid 
+                    <controls:DataGrid  CellEditEnded="DataGrid_CellEditEnded"
     ItemsSource="{x:Bind ViewModel.FilteredTransactions, Mode=OneWay}"
     AutoGenerateColumns="False"
     Margin="12"
@@ -337,22 +337,19 @@
 
 
                             <!-- 🏷 CATEGORY -->
-                            <!--<controls:DataGridComboBoxColumn
-                                Header="Category"
-                                ItemsSource="{x:Bind ViewModel.DisplayCategories, Mode=OneWay}"/>-->
 
-                            <controls:DataGridTemplateColumn Header="Category" Width="*">
+                            <controls:DataGridTemplateColumn Header="Category" Width="*" >
                                 <controls:DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate x:DataType="dto:TransactionDTO">
                                         <TextBlock Text="{x:Bind CategoryName}"/>
                                     </DataTemplate>
                                 </controls:DataGridTemplateColumn.CellTemplate>
 
-                                <controls:DataGridTemplateColumn.CellEditingTemplate>
+                                <controls:DataGridTemplateColumn.CellEditingTemplate >
                                     <DataTemplate x:DataType="dto:TransactionDTO">
                                         <ComboBox x:Name="EditCategoryDataGridComboBox"
-                                                 ItemsSource="{Binding Source={StaticResource CategoriesProxy}}"
-                                                  SelectedValue="{x:Bind CategoryId, Mode=TwoWay}"
+                                                 ItemsSource="{Binding Source={StaticResource CategoriesProxy}, Mode=TwoWay}"
+                                                  SelectedValue="{Binding CategoryId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                   SelectedValuePath="Id"
                                                   DisplayMemberPath="CategoryName" HorizontalAlignment="Stretch"/>
                                     </DataTemplate>

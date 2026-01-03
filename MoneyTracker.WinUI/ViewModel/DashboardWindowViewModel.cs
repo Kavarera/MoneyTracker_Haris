@@ -55,15 +55,21 @@ namespace MoneyTracker.WinUI.ViewModel
         
         public void ToggleEditMode()
         {
-            if (IsEditMode)
+            if (IsEditMode) // Jika sekarang sedang edit, berarti user menekan "Save"
             {
+                // Beri tahu UI untuk commit semua perubahan yang menggantung
+                IsEditMode = false;
+                EditButtonContent = "Edit Mode";
+                SaveToDatabase(); // Baru panggil save
+            }
+            else
+            {
+                // Masuk ke mode edit
                 Snapshot.Clear();
                 Snapshot.AddRange(FilteredTransactions.Select(t => t.Clone()));
+                IsEditMode = true;
+                EditButtonContent = "Save Changes";
             }
-            IsEditMode = !IsEditMode;
-            EditButtonContent = IsEditMode ? "Save Changes" : "Edit Mode";
-            _log.LogInformation($"Toggle Edit Mode Clicked = {IsEditMode}");
-            if (!IsEditMode) SaveToDatabase();
         }
 
         private async void SaveToDatabase()
@@ -76,6 +82,7 @@ namespace MoneyTracker.WinUI.ViewModel
                 // Tapi pastikan Kind Date adalah UTC agar tidak error lagi
                 t.TransactionDate = DateTime.SpecifyKind(t.TransactionDate, DateTimeKind.Utc);
                 var original = Snapshot.First(x => x.Id == t.Id);
+                _log.LogInformation($"IS EQUAL = {AreEqual(original, t)}");
                 if (!AreEqual(original, t))
                 {
                     updates.Add(t);
@@ -122,6 +129,13 @@ namespace MoneyTracker.WinUI.ViewModel
         {
             _log.LogInformation("Toggle Split Pane Changed");
             IsSplitPaneOpen = !IsSplitPaneOpen;
+        }
+
+        public void RefreshFilteredTransactions()
+        {
+            // Ini akan memberitahu DataGrid: "Seluruh list FilteredTransactions berubah"
+            // Sehingga DataGrid akan me-refresh tampilan TextBlock (CellTemplate)
+            OnPropertyChanged(nameof(FilteredTransactions));
         }
 
         public void SyncDataSplitView()
