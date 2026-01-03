@@ -159,7 +159,8 @@ namespace MoneyTracker.WinUI.View
             picker.FileTypeFilter.Add(".csv");
             var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
             WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
-            await picker.PickSingleFileAsync();
+            var file = await picker.PickSingleFileAsync();
+            _viewModel.ReadCsvCategories(file);
         }
     }
 }

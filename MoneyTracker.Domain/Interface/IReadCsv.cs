@@ -5,7 +5,7 @@ namespace MoneyTracker.Domain.Interface
 {
     public interface IReadCsvCategories
     {
-        Task ReadCategories(string path);
+        Task ReadCategories(string path, CancellationToken ct = default);
     }
     public interface IReadCsvAccounts
     {

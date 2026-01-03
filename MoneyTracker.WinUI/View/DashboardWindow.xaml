@@ -61,7 +61,9 @@
                                       Visibility="{Binding IsLoadingData, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                         <ListView Grid.Row="1" x:Name="AccountsList" ItemsSource="{x:Bind _viewModel.DisplayAccounts, Mode=OneWay}"
-                                  Visibility="{Binding IsNotLoadingData, Converter={StaticResource BoolToVisibilityConverter}}">
+                                  Visibility="{Binding IsNotLoadingData, Converter={StaticResource BoolToVisibilityConverter}}"
+                                  ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                  ScrollViewer.VerticalScrollMode="Enabled" MaxHeight="500">
                             <ListView.ItemTemplate>
                                 <DataTemplate x:DataType="dto:AccountDTO">
                                     <TextBlock Text="{Binding Name}"/>
@@ -77,7 +79,9 @@
                         <ListView Grid.Row="3" x:Name="CategoriesList" ItemsSource="{x:Bind _viewModel.DisplayCategories, Mode=OneWay}" IsItemClickEnabled="True"
                                   Visibility="{Binding IsNotLoadingData, Converter={StaticResource BoolToVisibilityConverter}}"
                                   SelectionMode="Single"
-                                  ItemClick="CategoriesList_ItemClick">
+                                  ItemClick="CategoriesList_ItemClick"
+                                  ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                  ScrollViewer.VerticalScrollMode="Enabled" MaxHeight="500">
                             <ListView.ItemTemplate>
                                 <DataTemplate x:DataType="dto:CategoryDTO">
                                     <TextBlock Text="{Binding CategoryName}"/>
@@ -89,7 +93,7 @@
                     </Grid>
 
                     <!--Untuk setting accounts list mana yg mau muncul dan kategori list mana yg mau muncul-->
-                    <StackPanel Grid.Row="3">
+                    <StackPanel Grid.Row="3" MaxHeight="600">
 
                         <Expander x:Name="settingsExpander" ExpandDirection="Up" VerticalAlignment="Bottom">
                             <Expander.Header>
@@ -114,7 +118,7 @@
                                     <!--Account List-->
                                     <TextBlock Grid.Row="1" Text="Accounts" Margin="10,5" FontWeight="SemiBold" FontSize="18"/>
                                     <ListView Grid.Row="2" x:Name="AccountsListSettings" ItemsSource="{x:Bind _viewModel.Accounts, Mode=OneWay}" SelectionMode="Multiple"
-                                              IsItemClickEnabled="True"
+                                              IsItemClickEnabled="True" 
                                             Visibility="{Binding IsNotLoadingData, Converter={StaticResource BoolToVisibilityConverter}}"
                                               SelectionChanged="AccountsListSettings_SelectionChanged"
                                               ItemClick="AccountsListSettings_ItemClick">
@@ -131,7 +135,10 @@
                                     <ListView Grid.Row="4" x:Name="CategoriesListSettings" ItemsSource="{x:Bind _viewModel.Categories, Mode=OneWay}" IsItemClickEnabled="True"
                                             Visibility="{Binding IsNotLoadingData, Converter={StaticResource BoolToVisibilityConverter}}" SelectionMode="Multiple"
                                             ItemClick="CategoriesListSettings_ItemClick"
-                                              SelectionChanged="CategoriesListSettings_SelectionChanged">
+                                              SelectionChanged="CategoriesListSettings_SelectionChanged"
+                                              MaxHeight="300"
+                                              ScrollViewer.VerticalScrollMode="Enabled"
+                                              ScrollViewer.VerticalScrollBarVisibility="Auto">
                                         <ListView.ItemTemplate>
                                             <DataTemplate x:DataType="dto:CategoryDTO">
                                                 <TextBlock Text="{Binding CategoryName}"/>

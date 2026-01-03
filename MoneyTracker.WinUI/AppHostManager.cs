@@ -43,6 +43,7 @@ namespace MoneyTracker.WinUI
                 //UseCase
                 services.AddTransient<GetAccounts>(); 
                 services.AddTransient<GetCategories>(); 
+                services.AddTransient<ImportCategories>();
 
                 //Infrastructure Layer
                 services.AddInfrastructure();

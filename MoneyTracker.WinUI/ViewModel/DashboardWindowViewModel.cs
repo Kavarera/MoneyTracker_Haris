@@ -105,10 +105,27 @@ namespace MoneyTracker.WinUI.ViewModel
             }
         }
 
-        public async void ReadCsv(Windows.Storage.StorageFile file)
+        public async void ReadCsvCategories(Windows.Storage.StorageFile file)
         {
-            await _importCategories.ExecuteAsync(file.Path.ToString());
-            //then refresh the data
+            if(file== null)
+            {
+                _log.LogWarning("No file selected for importing categories.");
+                return;
+            }
+
+            IsLoadingData = true;
+            try
+            {
+                await _importCategories.ExecuteAsync(file.Path.ToString());
+                await LoadAsync();
+            }catch(Exception ex)
+            {
+                _log.LogError(ex,$"Failed to import categories from CSV: {ex.Message}");
+            }
+            finally
+            {
+                IsLoadingData = false;
+            }
         }
 
         internal void Dispose()

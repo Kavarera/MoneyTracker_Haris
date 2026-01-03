@@ -16,7 +16,7 @@ namespace MoneyTracker.WinUI.ViewModel
 
         [ObservableProperty] private string _host = "localhost";
         [ObservableProperty] private double _port = 5432; // NumberBox menggunakan double
-        [ObservableProperty] private string _database = "moneytracker";
+        [ObservableProperty] private string _database = "moneytracker2";
         [ObservableProperty] private string _username = "postgres";
         [ObservableProperty] private string _password = "123456";
         [ObservableProperty] private string _statusMessage;
