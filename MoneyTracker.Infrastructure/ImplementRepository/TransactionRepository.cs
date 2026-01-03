@@ -32,6 +32,15 @@ namespace MoneyTracker.Infrastructure.ImplementRepository
                 if (entity == null)
                     continue;
 
+                // hitung selisih antara value baru dan lama
+                var kreditDiff = dto.Kredit - entity.Kredit;
+                var debitDiff = dto.Debit - entity.Debit;
+
+                //update saldo
+                entity.LastBalance += kreditDiff;
+                entity.LastBalance -= debitDiff;
+
+
                 entity.TransactionDate = dto.TransactionDate;
                 entity.Note = dto.Note;
                 entity.Status = dto.Status;
@@ -39,8 +48,10 @@ namespace MoneyTracker.Infrastructure.ImplementRepository
                 entity.CategoryId = dto.CategoryId;
                 entity.Kredit = dto.Kredit;
                 entity.Debit = dto.Debit;
-                entity.LastBalance += dto.Kredit;
-                entity.LastBalance -= dto.Debit;
+
+                // update value transaksi
+                entity.Kredit = dto.Kredit;
+                entity.Debit = dto.Debit;
             }
 
             await _db.SaveChangesAsync();

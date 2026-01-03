@@ -297,7 +297,7 @@ namespace MoneyTracker.WinUI.View.Pages
                             editedTransaction.TransactionDate = datePicker.Date.Value.DateTime;
                         }
                     }
-                    else if (header == "Status")
+                    if (header == "Status")
                     {
                         var comboBox = FindChildOfType<ComboBox>(cellContent);
                         if (comboBox?.SelectedItem is string newStatus)
@@ -306,100 +306,135 @@ namespace MoneyTracker.WinUI.View.Pages
                             editedTransaction.Status = newStatus.Split().First().ToString();
                         }
                     }
-                    // Tambahkan logika Category/Account di sini juga jika belum jalan
+
+                    // Logika manual tambahan untuk Credit
+                    if (header == "Credit")
+                    {
+                        var numberBox = FindChildOfType<NumberBox>(cellContent);
+                        if (numberBox != null && !double.IsNaN(numberBox.Value))
+                        {
+                            editedTransaction.Kredit = (decimal)numberBox.Value;
+                        }
+                    }
+
+                    if (header == "Debit")
+                    {
+                        var numberBox = FindChildOfType<NumberBox>(cellContent);
+                        if (numberBox != null && !double.IsNaN(numberBox.Value))
+                        {
+                            editedTransaction.Debit = (decimal)numberBox.Value;
+                        }
+                    }
+
+                    if (header == "Category")
+                    {
+                        var comboBox = FindChildOfType<ComboBox>(cellContent);
+                        if (comboBox != null && comboBox.SelectedValue != null)
+                        {
+                            var newCategoryId = (int)comboBox.SelectedValue;
+                            var category = ViewModel.Categories.FirstOrDefault(c => c.Id == newCategoryId);
+                            if (category != null)
+                            {
+                                editedTransaction.CategoryId = category.Id;
+                                editedTransaction.CategoryName = category.CategoryName;
+                            }
+                        }
+
+                        // Tambahkan logika Category/Account di sini juga jika belum jalan
+                    }
+
+                    // 3. JURUS PAMUNGKAS (Pindahkan ke paling bawah)
+                    // Reset DataContext baris ini untuk memaksa SEMUA TextBlock (Status, Date, dll) menggambar ulang
+                    var currentData = e.Row.DataContext;
+                    e.Row.DataContext = null;
+                    e.Row.DataContext = currentData;
+
+                    // 4. Refresh List (Opsional tapi bagus untuk totalitas)
+                    ViewModel.RefreshFilteredTransactions();
+
+                    log.LogInformation("Update data and UI refresh completed.");
                 }
 
-                // 3. JURUS PAMUNGKAS (Pindahkan ke paling bawah)
-                // Reset DataContext baris ini untuk memaksa SEMUA TextBlock (Status, Date, dll) menggambar ulang
-                var currentData = e.Row.DataContext;
-                e.Row.DataContext = null;
-                e.Row.DataContext = currentData;
+                //if (e.EditAction == CommunityToolkit.WinUI.UI.Controls.DataGridEditAction.Commit)
+                //{
+                //    // TRIK SAKTI: Reset DataContext baris ini agar TextBlock membaca ulang {Binding Status}
+                //    var rowData = e.Row.DataContext;
+                //    e.Row.DataContext = null;
+                //    e.Row.DataContext = rowData;
 
-                // 4. Refresh List (Opsional tapi bagus untuk totalitas)
-                ViewModel.RefreshFilteredTransactions();
+                //    log.LogInformation("Row UI Refreshed");
+                //}
+                //if (e.EditAction == CommunityToolkit.WinUI.UI.Controls.DataGridEditAction.Commit)
+                //{
+                //    if (e.Row.DataContext is TransactionDTO editedTransaction)
+                //    {
+                //        // Ambil elemen visual dari sel yang baru saja diedit
+                //        var cellContent = e.Column.GetCellContent(e.Row);
 
-                log.LogInformation("Update data and UI refresh completed.");
+                //        if (e.Column.Header.ToString() == "Transaction Date")
+                //        {
+                //            // Ambil CalendarDatePicker dari dalam DataTemplate
+                //            var datePicker = cellContent as CalendarDatePicker;
+
+                //            // Jika datePicker null, kemungkinan dia dibungkus Panel/Grid
+                //            if (datePicker == null && cellContent is FrameworkElement fe)
+                //            {
+                //                // Cari ke bawah hirarki visual
+                //                datePicker = FindChildOfType<CalendarDatePicker>(cellContent);
+                //            }
+
+                //            if (datePicker != null && datePicker.Date.HasValue)
+                //            {
+                //                // AMBIL NILAI LANGSUNG DARI UI DAN MASUKKAN KE DTO
+                //                editedTransaction.TransactionDate = datePicker.Date.Value.DateTime;
+                //                log.LogInformation($"Berhasil dipaksa update: {editedTransaction.TransactionDate}");
+                //            }
+                //        }
+                //    }
+
+                //    // PENTING: Picu refresh agar TextBlock di CellTemplate baca ulang
+                //    ViewModel.RefreshFilteredTransactions();
+                //}
+                //------
+
+                //if (e.EditAction == CommunityToolkit.WinUI.UI.Controls.DataGridEditAction.Commit)
+                //{
+                //    // Cara mengambil elemen ComboBox yang sedang aktif di sel tersebut:
+                //    FrameworkElement cellContent = e.Column.GetCellContent(e.Row);
+
+                //    // Cari ComboBox di dalam content tersebut
+                //    ComboBox comboBox = cellContent as ComboBox;
+
+                //    // Jika tidak ketemu langsung (karena di dalam DataTemplate), kita cari secara manual
+                //    if (comboBox == null && cellContent is Panel panel)
+                //    {
+                //        comboBox = panel.Children.OfType<ComboBox>().FirstOrDefault();
+                //    }
+
+                //    if (comboBox != null && e.Row.DataContext is TransactionDTO editedTransaction)
+                //    {
+                //        // Pastikan SelectedValue tidak null sebelum di-cast
+                //        if (comboBox.SelectedValue != null)
+                //        {
+                //            var newCategoryId = (int)comboBox.SelectedValue;
+
+                //            // Cari di daftar kategori asli
+                //            var category = ViewModel.Categories.FirstOrDefault(c => c.Id == newCategoryId);
+
+                //            if (category != null)
+                //            {
+                //                editedTransaction.CategoryId = category.Id;
+                //                editedTransaction.CategoryName = category.CategoryName;
+
+                //                log.LogInformation($"Berhasil update ke: {category.CategoryName}");
+                //            }
+                //        }
+                //    }
+
+                //    // Paksa refresh UI agar TextBlock di CellTemplate muncul dengan nama baru
+                //    ViewModel.RefreshFilteredTransactions();
+                //}
             }
-
-            //if (e.EditAction == CommunityToolkit.WinUI.UI.Controls.DataGridEditAction.Commit)
-            //{
-            //    // TRIK SAKTI: Reset DataContext baris ini agar TextBlock membaca ulang {Binding Status}
-            //    var rowData = e.Row.DataContext;
-            //    e.Row.DataContext = null;
-            //    e.Row.DataContext = rowData;
-
-            //    log.LogInformation("Row UI Refreshed");
-            //}
-            //if (e.EditAction == CommunityToolkit.WinUI.UI.Controls.DataGridEditAction.Commit)
-            //{
-            //    if (e.Row.DataContext is TransactionDTO editedTransaction)
-            //    {
-            //        // Ambil elemen visual dari sel yang baru saja diedit
-            //        var cellContent = e.Column.GetCellContent(e.Row);
-
-            //        if (e.Column.Header.ToString() == "Transaction Date")
-            //        {
-            //            // Ambil CalendarDatePicker dari dalam DataTemplate
-            //            var datePicker = cellContent as CalendarDatePicker;
-
-            //            // Jika datePicker null, kemungkinan dia dibungkus Panel/Grid
-            //            if (datePicker == null && cellContent is FrameworkElement fe)
-            //            {
-            //                // Cari ke bawah hirarki visual
-            //                datePicker = FindChildOfType<CalendarDatePicker>(cellContent);
-            //            }
-
-            //            if (datePicker != null && datePicker.Date.HasValue)
-            //            {
-            //                // AMBIL NILAI LANGSUNG DARI UI DAN MASUKKAN KE DTO
-            //                editedTransaction.TransactionDate = datePicker.Date.Value.DateTime;
-            //                log.LogInformation($"Berhasil dipaksa update: {editedTransaction.TransactionDate}");
-            //            }
-            //        }
-            //    }
-
-            //    // PENTING: Picu refresh agar TextBlock di CellTemplate baca ulang
-            //    ViewModel.RefreshFilteredTransactions();
-            //}
-            //------
-
-            //if (e.EditAction == CommunityToolkit.WinUI.UI.Controls.DataGridEditAction.Commit)
-            //{
-            //    // Cara mengambil elemen ComboBox yang sedang aktif di sel tersebut:
-            //    FrameworkElement cellContent = e.Column.GetCellContent(e.Row);
-
-            //    // Cari ComboBox di dalam content tersebut
-            //    ComboBox comboBox = cellContent as ComboBox;
-
-            //    // Jika tidak ketemu langsung (karena di dalam DataTemplate), kita cari secara manual
-            //    if (comboBox == null && cellContent is Panel panel)
-            //    {
-            //        comboBox = panel.Children.OfType<ComboBox>().FirstOrDefault();
-            //    }
-
-            //    if (comboBox != null && e.Row.DataContext is TransactionDTO editedTransaction)
-            //    {
-            //        // Pastikan SelectedValue tidak null sebelum di-cast
-            //        if (comboBox.SelectedValue != null)
-            //        {
-            //            var newCategoryId = (int)comboBox.SelectedValue;
-
-            //            // Cari di daftar kategori asli
-            //            var category = ViewModel.Categories.FirstOrDefault(c => c.Id == newCategoryId);
-
-            //            if (category != null)
-            //            {
-            //                editedTransaction.CategoryId = category.Id;
-            //                editedTransaction.CategoryName = category.CategoryName;
-
-            //                log.LogInformation($"Berhasil update ke: {category.CategoryName}");
-            //            }
-            //        }
-            //    }
-
-            //    // Paksa refresh UI agar TextBlock di CellTemplate muncul dengan nama baru
-            //    ViewModel.RefreshFilteredTransactions();
-            //}
         }
 
         private void CalendarDatePicker_DateChanged(CalendarDatePicker sender, CalendarDatePickerDateChangedEventArgs args)
@@ -422,6 +457,33 @@ namespace MoneyTracker.WinUI.View.Pages
                 {
                     editedTransaction.Status = newStatus.Split().First().ToString();
                     log.LogInformation($"Status manual update: {newStatus}");
+                }
+            }
+        }
+
+        private void KreditNumberBox_ValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args)
+        {
+            if (sender.DataContext is TransactionDTO editedTransaction)
+            {
+                // Gunakan converter manual atau langsung cast jika yakin
+                // Karena NumberBox menggunakan double, kita ubah ke decimal untuk DTO
+                if (!double.IsNaN(args.NewValue))
+                {
+                    editedTransaction.Kredit = (decimal)args.NewValue;
+                    log.LogInformation($"Kredit updated: {editedTransaction.Kredit}");
+                }
+            }
+        }
+        private void DebitNumberBox_ValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args)
+        {
+            if (sender.DataContext is TransactionDTO editedTransaction)
+            {
+                // Gunakan converter manual atau langsung cast jika yakin
+                // Karena NumberBox menggunakan double, kita ubah ke decimal untuk DTO
+                if (!double.IsNaN(args.NewValue))
+                {
+                    editedTransaction.Debit = (decimal)args.NewValue;
+                    log.LogInformation($"Kredit updated: {editedTransaction.Debit}");
                 }
             }
         }

@@ -363,7 +363,7 @@
                                 <controls:DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate x:DataType="dto:TransactionDTO">
                                         <TextBlock 
-                                            Text="{x:Bind Kredit}"
+                                            Text="{Binding Kredit}"
                                             Foreground="Green"
                                             FontWeight="Bold"
                                             HorizontalAlignment="Right"/>
@@ -375,7 +375,8 @@
                                         <NumberBox
                         Value="{x:Bind utils:UnitConverter.DecimalToDouble(Kredit),
                                         BindBack=utils:UnitConverter.DoubleToDecimal,
-                                        Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                        Mode=TwoWay}"
+                                            ValueChanged="KreditNumberBox_ValueChanged"
                         SpinButtonPlacementMode="Compact"/>
                                     </DataTemplate>
                                 </controls:DataGridTemplateColumn.CellEditingTemplate>
@@ -387,7 +388,7 @@
                                 <controls:DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate x:DataType="dto:TransactionDTO">
                                         <TextBlock 
-                        Text="{x:Bind Debit}"
+                        Text="{Binding Debit}"
                         Foreground="Red"
                         FontWeight="Bold"
                         HorizontalAlignment="Right"/>
@@ -399,8 +400,8 @@
                                         <NumberBox
                         Value="{x:Bind utils:UnitConverter.DecimalToDouble(Debit),
                                         BindBack=utils:UnitConverter.DoubleToDecimal,
-                                        Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                        SpinButtonPlacementMode="Compact"/>
+                                        Mode=TwoWay}"
+                        SpinButtonPlacementMode="Compact" ValueChanged="DebitNumberBox_ValueChanged"/>
                                     </DataTemplate>
                                 </controls:DataGridTemplateColumn.CellEditingTemplate>
                             </controls:DataGridTemplateColumn>
