@@ -5,19 +5,28 @@ using Microsoft.UI.Xaml.Controls;
 using MoneyTracker.Application.DTO;
 using MoneyTracker.WinUI.ViewModel;
 using System;
+using Microsoft.UI.Xaml.Media;
+using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
+using System.Linq;
 
 
 namespace MoneyTracker.WinUI.View.Pages
 {
     public sealed partial class DashboardPage : Page
     {
-        public DashboardWindowViewModel ViewModel { get; }
-        public DashboardPage(DashboardWindowViewModel vm)
-        {
-            this.InitializeComponent();
-            ViewModel = vm ?? throw new ArgumentNullException(nameof(vm));
-            DataContext = ViewModel;
 
+        public DashboardWindowViewModel VM => (DashboardWindowViewModel)DataContext;
+        private readonly ILogger<DashboardPage> log;
+        public DashboardWindowViewModel ViewModel { get; set; }
+        public DashboardPage(DashboardWindowViewModel vm, ILogger<DashboardPage> logger)
+        {
+            ViewModel = vm ?? throw new ArgumentNullException(nameof(vm));
+            log = logger;
+            this.DataContext = ViewModel;
+            
+            this.InitializeComponent();
+            
             splitView.DataContext = ViewModel;
 
             //IntPtr hWnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
@@ -127,6 +136,19 @@ namespace MoneyTracker.WinUI.View.Pages
             }
         }
 
+        private void ApplyInnerFilter_Click(object sender, RoutedEventArgs e)
+        {
+            ViewModel.StartDate = startDatePicker.Date?.DateTime;
+            ViewModel.EndDate = endDatePicker.Date?.DateTime;
+            ViewModel.InnerCategory = categoryCombo.SelectedItem as CategoryDTO;
+            ViewModel.ApplyInnerFilter();
+        }
+
+        private void ResetInnerFilter_Click(object sender, RoutedEventArgs e)
+        {
+            ViewModel.ResetInnerFilter();
+        }
+
 
         private void selectAllDisplayDataButton_Click(object sender, RoutedEventArgs e)
         {
@@ -135,11 +157,14 @@ namespace MoneyTracker.WinUI.View.Pages
             ViewModel.SyncDataSplitView();
         }
 
-        private void resetAllDisplayDataButton_Click(object sender, RoutedEventArgs e)
+        private async void resetAllDisplayDataButton_Click(object sender, RoutedEventArgs e)
         {
             ResetSelectedAllAccounts(AccountsListSettings);
             ResetSelectedAllCategories(CategoriesListSettings);
             ViewModel.SyncDataSplitView();
+            //AccountsList.SelectedItems.Clear();
+            //CategoriesList.SelectedItems.Clear();
+            await ViewModel.LoadAsync();
         }
 
         private void ResetSelectedAllCategories(ListView categoriesListSettings)
@@ -180,6 +205,76 @@ namespace MoneyTracker.WinUI.View.Pages
             WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
             var file = await picker.PickSingleFileAsync();
             ViewModel.ReadCsvTransactions(file);
+        }
+
+        private void TransactionDataGrid_PreparingCellForEdit(object sender, CommunityToolkit.WinUI.UI.Controls.DataGridPreparingCellForEditEventArgs e)
+        {
+            log.LogInformation("1");
+            if (e.Column.Header?.ToString() != "Category")
+                return;
+
+            
+            log.LogInformation("2");
+            
+            var presenter = e.EditingElement as ContentPresenter;
+            if (presenter == null) return;
+
+            var root = presenter.Content as FrameworkElement;
+            if (root == null)
+                return;
+
+            var combo = FindChildOfType<ComboBox>(root);
+
+            log.LogInformation("3");
+            if (combo == null)
+                return;
+
+            // 1 ISI DATA
+            log.LogInformation("4");
+            combo.ItemsSource = ViewModel.Categories;
+
+            combo.DisplayMemberPath = "CategoryName";
+            combo.SelectedValuePath = "Id";
+
+            // 2 TEMUKAN ROW DATA (TransactionDTO)
+            var dto = (TransactionDTO)e.Row.DataContext;
+
+            // 3 SET CURRENT VALUE
+            combo.SelectedValue = dto.CategoryId;
+
+            // 4 REACT TO CHANGE
+            combo.SelectionChanged += (s, args) =>
+            {
+            log.LogInformation("5");
+                if (combo.SelectedValue is int id)
+                {
+            log.LogInformation("6");
+                    dto.CategoryId = id;
+
+                    var selected = ViewModel.Categories.FirstOrDefault(c => c.Id == id);
+                    dto.CategoryName = selected?.CategoryName ?? "";
+                }
+            };
+            log.LogInformation("7");
+        }
+
+
+        // Fungsi Helper untuk mencari kontrol di dalam Template
+        public static T FindChildOfType<T>(DependencyObject root) where T : class
+        {
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(root); i++)
+            {
+                var child = VisualTreeHelper.GetChild(root, i);
+
+                if (child is T match)
+                    return match;
+
+                var result = FindChildOfType<T>(child);
+                if (result != null)
+                    return result;
+            }
+
+            return null;
         }
     }
 }

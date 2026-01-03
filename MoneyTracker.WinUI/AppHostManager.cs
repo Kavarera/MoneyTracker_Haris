@@ -47,6 +47,7 @@ namespace MoneyTracker.WinUI
                 services.AddTransient<ImportCategories>();
                 services.AddTransient<ImportAccounts>();
                 services.AddTransient<ImportTransactions>();
+                services.AddTransient<SaveTransactions>();
 
                 //Infrastructure Layer
                 services.AddInfrastructure();

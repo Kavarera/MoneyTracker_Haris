@@ -5,8 +5,12 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:MoneyTracker.WinUI.View.Pages"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:utils="using:MoneyTracker.WinUI.Utils" xmlns:customCtrl="using:MoneyTracker.WinUI.Components" xmlns:dto="using:MoneyTracker.Application.DTO" xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
-    mc:Ignorable="d"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:utils="using:MoneyTracker.WinUI.Utils" 
+    xmlns:customCtrl="using:MoneyTracker.WinUI.Components" 
+    xmlns:dto="using:MoneyTracker.Application.DTO" 
+    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+    mc:Ignorable="d" 
+    x:Name="RootPage"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Page.Resources>
@@ -65,7 +69,9 @@
                         <ListView Grid.Row="1" x:Name="AccountsList" ItemsSource="{x:Bind ViewModel.DisplayAccounts, Mode=OneWay}"
                               Visibility="{Binding IsNotLoadingData, Converter={StaticResource BoolToVisibilityConverter}}"
                               ScrollViewer.VerticalScrollBarVisibility="Auto"
-                              ScrollViewer.VerticalScrollMode="Enabled" MaxHeight="500">
+                              ScrollViewer.VerticalScrollMode="Enabled" MaxHeight="500"
+                                  SelectedItem="{x:Bind ViewModel.SelectedAccount, Mode=TwoWay}"
+                                  >
                             <ListView.ItemTemplate>
                                 <DataTemplate x:DataType="dto:AccountDTO">
                                     <TextBlock Text="{Binding Name}"/>
@@ -83,7 +89,8 @@
                               SelectionMode="Single"
                               ItemClick="CategoriesList_ItemClick"
                               ScrollViewer.VerticalScrollBarVisibility="Auto"
-                              ScrollViewer.VerticalScrollMode="Enabled" MaxHeight="500">
+                              ScrollViewer.VerticalScrollMode="Enabled" MaxHeight="500"
+                                  SelectedItem="{x:Bind ViewModel.SelectedCategory, Mode=TwoWay}" >
                             <ListView.ItemTemplate>
                                 <DataTemplate x:DataType="dto:CategoryDTO">
                                     <TextBlock Text="{Binding CategoryName}"/>
@@ -183,14 +190,57 @@
                         </DropDownButton.Flyout>
                     </customCtrl:HandDropDownButton>
                     <StackPanel Grid.Column="1" Margin="20,0" Orientation="Horizontal" Spacing="20" HorizontalAlignment="Center">
-                        <customCtrl:HandButton Margin="5,20,0,0" Background="Transparent" BorderBrush="Transparent" >
-
+                        <ComboBox
+                            ItemsSource="{x:Bind ViewModel.Categories}"/>
+                        <!--Tombol Filter Inner-->
+                        <customCtrl:HandDropDownButton Margin="5,20,0,0" Background="Transparent" BorderBrush="Transparent"  >
                             <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE71C;" Foreground="Cyan">
                                 <FontIcon.Resources>
                                     <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="Cyan" />
                                 </FontIcon.Resources>
                             </FontIcon>
-                        </customCtrl:HandButton>
+
+                            <DropDownButton.Flyout>
+                                <Flyout Placement="Bottom">
+                                    <StackPanel Spacing="12" Width="260">
+
+                                        <TextBlock Text="Filter Transactions"
+                           FontWeight="SemiBold"/>
+
+                                        <!-- Start Date -->
+                                        <CalendarDatePicker
+                    Header="Start Date" x:Name="startDatePicker"
+                    Date="{x:Bind ViewModel.StartDate, Mode=TwoWay}"/>
+
+                                        <!-- End Date -->
+                                        <CalendarDatePicker
+                    Header="End Date" x:Name="endDatePicker"
+                    Date="{x:Bind ViewModel.EndDate, Mode=TwoWay}"/>
+
+                                        <!-- Category -->
+                                        <ComboBox
+                    Header="Category" x:Name="categoryCombo"
+                    ItemsSource="{x:Bind ViewModel.Categories}"
+                    DisplayMemberPath="CategoryName"
+                    SelectedItem="{x:Bind ViewModel.InnerCategory, Mode=TwoWay}"/>
+
+                                        <!-- Buttons -->
+                                        <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Right"
+                            Spacing="10">
+
+                                            <Button Content="Reset"
+                            Click="ResetInnerFilter_Click"/>
+
+                                            <Button Content="Apply"
+                            Click="ApplyInnerFilter_Click"/>
+                                        </StackPanel>
+
+                                    </StackPanel>
+                                </Flyout>
+                            </DropDownButton.Flyout>
+                        </customCtrl:HandDropDownButton>
+                        
                         <customCtrl:HandButton Margin="5,20,0,0" Background="White" BorderBrush="LightSkyBlue" Foreground="Blue"
                                            Content="{x:Bind ViewModel.EditButtonContent, Mode=OneWay}" CornerRadius="6" BorderThickness="3" FontWeight="SemiBold"
                                            Padding="20,5" Click="{x:Bind ViewModel.ToggleEditMode}">
@@ -209,8 +259,8 @@
 
                 <Grid Grid.Row="1">
 
-                    <controls:DataGrid
-    ItemsSource="{x:Bind ViewModel.Transactions, Mode=OneWay}"
+                    <controls:DataGrid 
+    ItemsSource="{x:Bind ViewModel.FilteredTransactions, Mode=OneWay}"
     AutoGenerateColumns="False"
     Margin="12"
     IsReadOnly="{x:Bind ViewModel.IsEditMode, Mode=OneWay, Converter={StaticResource InverseBoolConverter}}"
@@ -268,7 +318,7 @@
                             <controls:DataGridTemplateColumn Header="Status" Width="130">
                                 <controls:DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate x:DataType="dto:TransactionDTO">
-                                        <TextBlock Text="{x:Bind Status}" FontStyle="Italic"/>
+                                        <TextBlock Text="{x:Bind Status}" FontStyle="Italic" HorizontalAlignment="Center"/>
                                     </DataTemplate>
                                 </controls:DataGridTemplateColumn.CellTemplate>
 
@@ -285,6 +335,10 @@
 
 
                             <!-- 🏷 CATEGORY -->
+                            <!--<controls:DataGridComboBoxColumn
+                                Header="Category"
+                                ItemsSource="{x:Bind ViewModel.DisplayCategories, Mode=OneWay}"/>-->
+
                             <controls:DataGridTemplateColumn Header="Category" Width="*">
                                 <controls:DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate x:DataType="dto:TransactionDTO">
@@ -293,14 +347,13 @@
                                 </controls:DataGridTemplateColumn.CellTemplate>
 
                                 <controls:DataGridTemplateColumn.CellEditingTemplate>
-                                    <DataTemplate x:DataType="dto:TransactionDTO">
-                                        <ComboBox 
-                        ItemsSource="{Binding ElementName=GridAccounts, Path=DataContext.DisplayCategories}"
-                        DisplayMemberPath="CategoryName"
-                        SelectedValuePath="Id"
-                        SelectedValue="{x:Bind CategoryId, Mode=TwoWay}"/>
+                                    <DataTemplate>
+                                        <ComboBox x:Name="EditCategoryDataGridComboBox"
+                                                  ItemsSource="{x:Bind RootPage.ViewModel.DisplayCategories, Mode=OneWay}"
+                                                  DisplayMemberPath="CategoryName"/>
                                     </DataTemplate>
                                 </controls:DataGridTemplateColumn.CellEditingTemplate>
+
                             </controls:DataGridTemplateColumn>
 
 

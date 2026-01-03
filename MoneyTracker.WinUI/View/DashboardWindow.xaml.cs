@@ -6,6 +6,8 @@ using System;
 using Microsoft.UI.Xaml.Controls;
 using MoneyTracker.Application.DTO;
 using MoneyTracker.WinUI.View.Pages;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace MoneyTracker.WinUI.View
 {
@@ -17,7 +19,7 @@ namespace MoneyTracker.WinUI.View
         {
             _viewModel = vm ?? throw new ArgumentNullException(nameof(vm));
             this.InitializeComponent();
-            Content = new DashboardPage(_viewModel);
+            Content = new DashboardPage(_viewModel,AppHostManager.AppHost.Services.GetRequiredService<ILogger<DashboardPage>>());
             //splitView.DataContext = _viewModel;
 
             IntPtr hWnd = WinRT.Interop.WindowNative.GetWindowHandle(this);

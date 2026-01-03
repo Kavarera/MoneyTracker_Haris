@@ -12,8 +12,11 @@ namespace MoneyTracker.Application.DTO
         public string CategoryName { get; set; }
         public int CategoryId { get; set; }
         public string Status { get; set; }
+        public string AccountName { get; set; }
+        public int AccountId { get; set; }
 
-        public TransactionDTO(int id, DateTime transactionDate, string description, decimal kredit, decimal debit, decimal lastBalance, string categoryName, int categoryId, string status)
+        public TransactionDTO(int id, DateTime transactionDate, string description, decimal kredit, decimal debit, decimal lastBalance, 
+            string categoryName, int categoryId, string status, string accountName, int accountId)
         {
             Id = id;
             TransactionDate = transactionDate;
@@ -24,6 +27,13 @@ namespace MoneyTracker.Application.DTO
             CategoryName = categoryName;
             CategoryId = categoryId;
             Status = status;
+            AccountName = accountName;
+            AccountId = accountId;
+        }
+
+        public TransactionDTO Clone()
+        {
+            return (TransactionDTO)this.MemberwiseClone();
         }
 
 

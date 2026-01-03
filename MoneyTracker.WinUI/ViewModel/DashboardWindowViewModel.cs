@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
+using Microsoft.UI.Xaml;
 using MoneyTracker.Application.DTO;
 using MoneyTracker.Application.Usecase;
 using System;
@@ -21,12 +22,22 @@ namespace MoneyTracker.WinUI.ViewModel
         private readonly ImportCategories _importCategories;
         private readonly ImportAccounts _importAccounts;
         private readonly ImportTransactions _importTransactions;
+        private readonly SaveTransactions _saveTransactions;
 
         public ObservableCollection<AccountDTO> Accounts { get; } = new();
         public ObservableCollection<CategoryDTO> Categories { get; } = new();
         public ObservableCollection<TransactionDTO> Transactions { get; } = new();
+        public ObservableCollection<TransactionDTO> AllTransactions { get; } = new();
+        public ObservableCollection<TransactionDTO> FilteredTransactions { get; } = new();
+        public List<TransactionDTO> Snapshot { get; } = new();
 
-        
+        [ObservableProperty]
+        private AccountDTO? _selectedAccount;
+
+        [ObservableProperty]
+        private CategoryDTO? _selectedCategory;
+
+
 
         public IEnumerable<CategoryDTO> DisplayCategories => Categories.Where(c => c.IsDisplay);
         public IEnumerable<AccountDTO> DisplayAccounts => Accounts.Where(c => c.IsDisplay);
@@ -41,25 +52,43 @@ namespace MoneyTracker.WinUI.ViewModel
         
         public void ToggleEditMode()
         {
+            if (IsEditMode)
+            {
+                Snapshot.Clear();
+                Snapshot.AddRange(FilteredTransactions.Select(t => t.Clone()));
+            }
             IsEditMode = !IsEditMode;
             EditButtonContent = IsEditMode ? "Save Changes" : "Edit Mode";
             _log.LogInformation($"Toggle Edit Mode Clicked = {IsEditMode}");
-
             if (!IsEditMode) SaveToDatabase();
         }
 
         private async void SaveToDatabase()
         {
+            var updates = new List<TransactionDTO>();
             // Pastikan semua DateTime adalah UTC sebelum dikirim ke PostgreSQL
-            foreach (var t in Transactions)
+            foreach (var t in FilteredTransactions)
             {
                 // Logika konversi Status "Reconciled" -> "R" biasanya dihandle di DB Context
                 // Tapi pastikan Kind Date adalah UTC agar tidak error lagi
                 t.TransactionDate = DateTime.SpecifyKind(t.TransactionDate, DateTimeKind.Utc);
+                var original = Snapshot.First(x => x.Id == t.Id);
+                if (!AreEqual(original, t))
+                {
+                    updates.Add(t);
+                }
             }
 
-            //await _db.SaveChangesAsync();
+            if (updates.Any())
+            {
+                await _saveTransactions.ExecuteAsync(updates);
+            }
+            // refresh snapshot
+            Snapshot.Clear();
+            Snapshot.AddRange(AllTransactions.Select(t => t.Clone()));
+
             // Berikan notifikasi sukses jika perlu
+            await LoadAsync();
         }
 
         public bool IsNotLoadingData => !IsLoadingData;
@@ -72,7 +101,8 @@ namespace MoneyTracker.WinUI.ViewModel
 
         public DashboardWindowViewModel(ILogger<DashboardWindowViewModel> logger, 
             GetAccounts getAccounts, GetCategories getCategories, 
-            ImportCategories importCategories, ImportAccounts importAccounts, ImportTransactions importTransactions, GetTransactions getTransactions)
+            ImportCategories importCategories, ImportAccounts importAccounts, ImportTransactions importTransactions, GetTransactions getTransactions,
+            SaveTransactions saveTransactions)
         {
             _log = logger;
             _getAccounts = getAccounts;
@@ -81,6 +111,7 @@ namespace MoneyTracker.WinUI.ViewModel
             _importAccounts = importAccounts;
             _importTransactions = importTransactions;
             _getTransactions = getTransactions;
+            _saveTransactions = saveTransactions;
         }
 
         [RelayCommand]
@@ -108,6 +139,34 @@ namespace MoneyTracker.WinUI.ViewModel
             OnPropertyChanged(nameof(DisplayAccounts));
         }
 
+        partial void OnSelectedAccountChanged(AccountDTO value)
+        {
+            ApplyFilters();
+        }
+
+        partial void OnSelectedCategoryChanged(CategoryDTO value)
+        {
+            ApplyFilters();
+        }
+
+
+        private void ApplyFilters()
+        {
+            var query = AllTransactions.AsEnumerable();
+
+            if (SelectedAccount is not null)
+                query = query.Where(t => t.AccountId == SelectedAccount.Id);
+
+            if (SelectedCategory is not null)
+                query = query.Where(t => t.CategoryId == SelectedCategory.Id);
+
+            Transactions.Clear();
+            foreach (var item in query)
+                Transactions.Add(item);
+            ApplyInnerFilter();
+        }
+
+
         public async Task LoadAsync()
         {
             IsLoadingData = true;
@@ -121,6 +180,7 @@ namespace MoneyTracker.WinUI.ViewModel
                 IsLoadingData = false;
                 Accounts.Clear();
                 Categories.Clear();
+                AllTransactions.Clear();
                 foreach (var item in items)
                 {
                     Accounts.Add(item);
@@ -131,10 +191,11 @@ namespace MoneyTracker.WinUI.ViewModel
                 }
                 foreach(var item in itemTransactions)
                 {
-                    _log.LogInformation($"DATA TRABNSAKSI = {item.Description} - {item.Status}");
-                    Transactions.Add(item);
+                    //_log.LogInformation($"DATA TRABNSAKSI = {item.Description} - {item.Status}");
+                    AllTransactions.Add(item);
+                    Snapshot.Add(item.Clone());
                 }
-
+                ApplySidebarFilter();
                 // beri tahu UI bahwa DisplayCategories DisplayAccounts berubah
                 OnPropertyChanged(nameof(DisplayCategories));
                 OnPropertyChanged(nameof(DisplayAccounts));
@@ -148,6 +209,61 @@ namespace MoneyTracker.WinUI.ViewModel
                 IsLoadingData = false;
             }
         }
+
+        private void ApplySidebarFilter()
+        {
+            Transactions.Clear();
+
+            var filtered = AllTransactions.AsEnumerable();
+
+            if (SelectedAccount != null)
+                filtered = filtered.Where(t => t.AccountId == SelectedAccount.Id);
+
+            if (SelectedCategory != null)
+                filtered = filtered.Where(t => t.CategoryId == SelectedCategory.Id);
+
+            foreach (var t in filtered)
+                Transactions.Add(t);
+
+            ApplyInnerFilter(); // penting!
+        }
+
+        public DateTimeOffset? StartDate { get; set; }
+        public DateTimeOffset? EndDate { get; set; }
+        public CategoryDTO? InnerCategory { get; set; }
+
+        public void ResetInnerFilter()
+        {
+            StartDate = null;
+            EndDate = null;
+            InnerCategory = null;
+
+            ApplyInnerFilter();
+        }
+
+
+        public void ApplyInnerFilter()
+        {
+            FilteredTransactions.Clear();
+
+            var q = Transactions.AsEnumerable();
+
+            if (StartDate != null)
+            {
+                q = q.Where(t => t.TransactionDate >= StartDate?.DateTime);
+            }
+                
+
+            if (EndDate != null)
+                q = q.Where(t => t.TransactionDate <= EndDate?.DateTime);
+
+            if (InnerCategory != null)
+                q = q.Where(t => t.CategoryId == InnerCategory.Id);
+
+            foreach (var t in q)
+                FilteredTransactions.Add(t);
+        }
+
 
         public async void ReadCsvCategories(Windows.Storage.StorageFile file)
         {
@@ -219,6 +335,19 @@ namespace MoneyTracker.WinUI.ViewModel
                 IsLoadingData = false;
             }
         }
+
+        private bool AreEqual(TransactionDTO a, TransactionDTO b)
+        {
+            return
+                a.TransactionDate == b.TransactionDate &&
+                a.Description == b.Description &&
+                a.Status == b.Status &&
+                a.CategoryId == b.CategoryId &&
+                a.Kredit == b.Kredit &&
+                a.Debit == b.Debit;
+        }
+
+
 
         internal void Dispose()
         {

@@ -10,5 +10,6 @@ namespace MoneyTracker.Domain.Interface
     public interface ITransactionsRepository
     {
         Task<IReadOnlyList<TransactionEntity>> GetAllAsync(CancellationToken cancellationToken = default);
+        Task UpdateRangeAsync(IEnumerable<TransactionEntity> datas);
     }
 }

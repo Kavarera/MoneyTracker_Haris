@@ -1,5 +1,6 @@
 ﻿using MoneyTracker.Application.DTO;
 using MoneyTracker.Domain.Interface;
+using System.Linq;
 
 namespace MoneyTracker.Application.Usecase
 {
@@ -22,7 +23,7 @@ namespace MoneyTracker.Application.Usecase
             return transactions
                 .OrderBy(c => c.CreatedDate)
                 .Select(c => new TransactionDTO(c.Id, c.TransactionDate, c.Note, c.Kredit,c.Debit,c.LastBalance,c.Category.CategoryName, 
-                c.CategoryId,c.Status == Domain.Enums.TransactionStatus.Reconciled ? "R" : "U")).OrderByDescending(c=>c.TransactionDate)
+                c.CategoryId,c.Status == Domain.Enums.TransactionStatus.Reconciled ? "R" : "U", c.Account.AccountName, c.Account.Id)).OrderByDescending(c=>c.TransactionDate)
                 .ToList();
         }
     }

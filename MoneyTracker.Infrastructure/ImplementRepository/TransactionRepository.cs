@@ -22,5 +22,28 @@ namespace MoneyTracker.Infrastructure.ImplementRepository
         {
             return await _db.Transactions.Include(t=>t.Category).Include(t=>t.Account).AsNoTracking().ToListAsync(cancellationToken);
         }
+
+        public async Task UpdateRangeAsync(IEnumerable<TransactionEntity> datas)
+        {
+            foreach (var dto in datas)
+            {
+                var entity = await _db.Transactions.FindAsync(dto.Id);
+
+                if (entity == null)
+                    continue;
+
+                entity.TransactionDate = dto.TransactionDate;
+                entity.Note = dto.Note;
+                entity.Status = dto.Status;
+
+                entity.CategoryId = dto.CategoryId;
+                entity.Kredit = dto.Kredit;
+                entity.Debit = dto.Debit;
+                entity.LastBalance += dto.Kredit;
+                entity.LastBalance -= dto.Debit;
+            }
+
+            await _db.SaveChangesAsync();
+        }
     }
 }
