@@ -28,6 +28,8 @@ namespace MoneyTracker.Infrastructure
             services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
             services.AddSingleton<IReadCsvCategories,ReadCsvCategoriesService>();
+            services.AddSingleton<IReadCsvAccounts, ReadCsvAccountsService>();
+            services.AddSingleton<IReadCsvTransactions, ReadCsvTransactionsService>();
 
             return services;
         }

@@ -162,5 +162,25 @@ namespace MoneyTracker.WinUI.View
             var file = await picker.PickSingleFileAsync();
             _viewModel.ReadCsvCategories(file);
         }
+
+        private async void ImportAccountsMFItem_Click(object sender, RoutedEventArgs e)
+        {
+            var picker = new Windows.Storage.Pickers.FileOpenPicker();
+            picker.FileTypeFilter.Add(".csv");
+            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
+            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
+            var file = await picker.PickSingleFileAsync();
+            _viewModel.ReadCsvAccounts(file);
+        }
+
+        private async void ImportTransactionsMFItem_Click(object sender, RoutedEventArgs e)
+        {
+            var picker = new Windows.Storage.Pickers.FileOpenPicker();
+            picker.FileTypeFilter.Add(".csv");
+            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
+            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
+            var file = await picker.PickSingleFileAsync();
+            _viewModel.ReadCsvTransactions(file);
+        }
     }
 }

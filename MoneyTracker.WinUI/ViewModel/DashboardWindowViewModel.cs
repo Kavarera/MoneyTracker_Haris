@@ -19,6 +19,8 @@ namespace MoneyTracker.WinUI.ViewModel
         private readonly GetAccounts _getAccounts;
         private readonly GetCategories _getCategories;
         private readonly ImportCategories _importCategories;
+        private readonly ImportAccounts _importAccounts;
+        private readonly ImportTransactions _importTransactions;
 
         public ObservableCollection<AccountDTO> Accounts { get; } = new();
         public ObservableCollection<CategoryDTO> Categories { get; } = new();
@@ -37,12 +39,16 @@ namespace MoneyTracker.WinUI.ViewModel
         }
 
 
-        public DashboardWindowViewModel(ILogger<DashboardWindowViewModel> logger, GetAccounts getAccounts, GetCategories getCategories, ImportCategories importCategories)
+        public DashboardWindowViewModel(ILogger<DashboardWindowViewModel> logger, 
+            GetAccounts getAccounts, GetCategories getCategories, 
+            ImportCategories importCategories, ImportAccounts importAccounts, ImportTransactions importTransactions)
         {
             _log = logger;
             _getAccounts = getAccounts;
             _getCategories = getCategories;
             _importCategories = importCategories;
+            _importAccounts = importAccounts;
+            _importTransactions = importTransactions;
         }
 
         [RelayCommand]
@@ -121,6 +127,54 @@ namespace MoneyTracker.WinUI.ViewModel
             }catch(Exception ex)
             {
                 _log.LogError(ex,$"Failed to import categories from CSV: {ex.Message}");
+            }
+            finally
+            {
+                IsLoadingData = false;
+            }
+        }
+
+        public async void ReadCsvAccounts(Windows.Storage.StorageFile file)
+        {
+            if (file == null)
+            {
+                _log.LogWarning("No file selected for importing categories.");
+                return;
+            }
+
+            IsLoadingData = true;
+            try
+            {
+                await _importAccounts.ExecuteAsync(file.Path.ToString());
+                await LoadAsync();
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, $"Failed to import categories from CSV: {ex.Message}");
+            }
+            finally
+            {
+                IsLoadingData = false;
+            }
+        }
+
+        public async void ReadCsvTransactions(Windows.Storage.StorageFile file)
+        {
+            if (file == null)
+            {
+                _log.LogWarning("No file selected for importing categories.");
+                return;
+            }
+
+            IsLoadingData = true;
+            try
+            {
+                await _importTransactions.ExecuteAsync(file.Path.ToString());
+                await LoadAsync();
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, $"Failed to import categories from CSV: {ex.Message}");
             }
             finally
             {

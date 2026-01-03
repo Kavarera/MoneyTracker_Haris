@@ -9,10 +9,10 @@ namespace MoneyTracker.Domain.Interface
     }
     public interface IReadCsvAccounts
     {
-        List<AccountEntity> ReadAccounts();
+        Task ReadAccounts(string path, CancellationToken ct = default);
     }
     public interface IReadCsvTransactions
     {
-        List<TransactionEntity> ReadTransactions();
+        Task ReadTransactions(string path, CancellationToken ct = default);
     }
 }

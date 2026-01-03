@@ -24,12 +24,14 @@ namespace MoneyTracker.Infrastructure.Persistence
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Id).ValueGeneratedOnAdd();
-                entity.Property(e => e.AccountNumber).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.AccountNumber).IsRequired(false).HasMaxLength(100);
                 entity.Property(e => e.AccountName).IsRequired().HasMaxLength(200);
                 entity.Property(e => e.CreatedDate).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(e => e.Amount).HasDefaultValue(0);
                 entity.HasIndex(e => e.AccountName).IsUnique();
-                entity.HasIndex(e => e.AccountNumber).IsUnique();
+                
+                entity.Property(e => e.UpdatedByUser).ValueGeneratedOnAddOrUpdate().HasDefaultValueSql("CURRENT_USER");
+                entity.Property(e => e.UpdatedDate).ValueGeneratedOnAddOrUpdate().HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
 
             //Setup EF untuk table Categories
@@ -50,7 +52,10 @@ namespace MoneyTracker.Infrastructure.Persistence
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.CreatedDate).HasDefaultValueSql("CURRENT_TIMESTAMP");
-                entity.Property(e => e.CreateByUser).IsRequired();
+                entity.Property(e => e.CreateByUser).IsRequired().HasDefaultValueSql("CURRENT_USER");
+                entity.Property(e => e.UpdatedByUser).ValueGeneratedOnAddOrUpdate().HasDefaultValueSql("CURRENT_USER");
+                entity.Property(e => e.UpdatedDate).ValueGeneratedOnAddOrUpdate().HasDefaultValueSql("CURRENT_TIMESTAMP");
+
                 entity.Property(e => e.TransactionDate).IsRequired();
                 entity.Property(e => e.Status).IsRequired().HasConversion(
                     v => v == TransactionStatus.Reconciled ? "R" : "U",

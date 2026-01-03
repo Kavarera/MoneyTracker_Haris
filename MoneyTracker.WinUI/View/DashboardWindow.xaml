@@ -93,9 +93,9 @@
                     </Grid>
 
                     <!--Untuk setting accounts list mana yg mau muncul dan kategori list mana yg mau muncul-->
-                    <StackPanel Grid.Row="3" MaxHeight="600">
+                    <StackPanel Grid.Row="3" MaxHeight="1000">
 
-                        <Expander x:Name="settingsExpander" ExpandDirection="Up" VerticalAlignment="Bottom">
+                        <Expander x:Name="settingsExpander" ExpandDirection="Up" VerticalAlignment="Top">
                             <Expander.Header>
                                 Select Accounts and Categories
                             </Expander.Header>
@@ -121,7 +121,8 @@
                                               IsItemClickEnabled="True" 
                                             Visibility="{Binding IsNotLoadingData, Converter={StaticResource BoolToVisibilityConverter}}"
                                               SelectionChanged="AccountsListSettings_SelectionChanged"
-                                              ItemClick="AccountsListSettings_ItemClick">
+                                              ItemClick="AccountsListSettings_ItemClick"
+                                              MaxHeight="300" ScrollViewer.VerticalScrollMode="Enabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
                                         <ListView.ItemTemplate>
                                             <DataTemplate x:DataType="dto:AccountDTO">
                                                 <TextBlock Text="{Binding Name}"/>
@@ -174,8 +175,8 @@
                         <DropDownButton.Flyout>
                             <MenuFlyout Placement="Bottom">
                                 <MenuFlyoutItem x:Name="ImportCategoriesMFItem" Text="Categories" Click="ImportCategoriesMFItem_Click"/>
-                                <MenuFlyoutItem Text="Accounts"/>
-                                <MenuFlyoutItem Text="Transactions"/>
+                                <MenuFlyoutItem x:Name="ImportAccountsMFItem" Text="Accounts" Click="ImportAccountsMFItem_Click"/>
+                                <MenuFlyoutItem x:Name="ImportTransactionsMFItem" Text="Transactions" Click="ImportTransactionsMFItem_Click"/>
                             </MenuFlyout>
                         </DropDownButton.Flyout>
                     </customCtrl:HandDropDownButton>
@@ -202,8 +203,8 @@
                         </customCtrl:HandButton>
                     </StackPanel>
                 </Grid>
+                <!--Bagian Table Transaksi bisa ada editmode langsung edit keseluruhan-->
             </Grid>
-
         </SplitView>
     </Grid>
 </Window>
