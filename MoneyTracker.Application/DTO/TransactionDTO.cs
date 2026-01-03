@@ -13,6 +13,21 @@ namespace MoneyTracker.Application.DTO
         public int CategoryId { get; set; }
         public string Status { get; set; }
 
+        public TransactionDTO(int id, DateTime transactionDate, string description, decimal kredit, decimal debit, decimal lastBalance, string categoryName, int categoryId, string status)
+        {
+            Id = id;
+            TransactionDate = transactionDate;
+            Description = description;
+            Kredit = kredit;
+            Debit = debit;
+            LastBalance = lastBalance;
+            CategoryName = categoryName;
+            CategoryId = categoryId;
+            Status = status;
+        }
+
+
+
         // KONVERSI TANGGAL
         // CalendarDatePicker.Date adalah DateTimeOffset?, maka input/output harus konsisten
         //public DateTimeOffset? DateTimeToOffset(DateTime dt)

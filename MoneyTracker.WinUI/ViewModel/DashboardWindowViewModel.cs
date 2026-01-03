@@ -17,6 +17,7 @@ namespace MoneyTracker.WinUI.ViewModel
 
         private readonly GetAccounts _getAccounts;
         private readonly GetCategories _getCategories;
+        private readonly GetTransactions _getTransactions;
         private readonly ImportCategories _importCategories;
         private readonly ImportAccounts _importAccounts;
         private readonly ImportTransactions _importTransactions;
@@ -71,7 +72,7 @@ namespace MoneyTracker.WinUI.ViewModel
 
         public DashboardWindowViewModel(ILogger<DashboardWindowViewModel> logger, 
             GetAccounts getAccounts, GetCategories getCategories, 
-            ImportCategories importCategories, ImportAccounts importAccounts, ImportTransactions importTransactions)
+            ImportCategories importCategories, ImportAccounts importAccounts, ImportTransactions importTransactions, GetTransactions getTransactions)
         {
             _log = logger;
             _getAccounts = getAccounts;
@@ -79,6 +80,7 @@ namespace MoneyTracker.WinUI.ViewModel
             _importCategories = importCategories;
             _importAccounts = importAccounts;
             _importTransactions = importTransactions;
+            _getTransactions = getTransactions;
         }
 
         [RelayCommand]
@@ -115,6 +117,7 @@ namespace MoneyTracker.WinUI.ViewModel
 
                 var items = await _getAccounts.ExecuteAsync();
                 var items2 = await _getCategories.ExecuteAsync();
+                var itemTransactions = await _getTransactions.ExecuteAsync();
                 IsLoadingData = false;
                 Accounts.Clear();
                 Categories.Clear();
@@ -125,6 +128,10 @@ namespace MoneyTracker.WinUI.ViewModel
                 foreach (var item in items2)
                 {
                     Categories.Add(item);
+                }
+                foreach(var item in itemTransactions)
+                {
+                    _log.LogInformation($"DATA TRABNSAKSI = {item.Description}");
                 }
 
                 // beri tahu UI bahwa DisplayCategories DisplayAccounts berubah

@@ -27,6 +27,7 @@ namespace MoneyTracker.Infrastructure
             //implement repo
             services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
+            services.AddScoped<ITransactionsRepository, TransactionRepository>();
             services.AddSingleton<IReadCsvCategories,ReadCsvCategoriesService>();
             services.AddSingleton<IReadCsvAccounts, ReadCsvAccountsService>();
             services.AddSingleton<IReadCsvTransactions, ReadCsvTransactionsService>();
